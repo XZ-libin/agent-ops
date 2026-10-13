@@ -196,7 +196,7 @@ func newEnv(t *testing.T) *testEnv {
 			// 假 PEM 用片段拼接：仓库内不得出现成块的 PEM 私钥标记
 			// （TestNoPrivateKeysCommittedInRepo 会扫到，本仓库既有做法同样如此）。
 			Payload: []byte(`{"capability":"linux.service.restart","status":"ok","exit_class":"zero",
-              "stdout":"` + fakePEM + `"}`)},}
+              "stdout":"` + fakePEM + `"}`)},
 		{ID: "ev4", Actor: "node:nod_AAA", Action: "node.enrolled", Target: "nod_AAA",
 			// 值级夹带：合法键里塞 PEM/JWT 特征，必须被值级筛查丢弃。
 			Payload: []byte(`{"node_id":"nod_AAA","event_kind":"-----BEGIN CERTIFICATE REQUEST-----QwAAAA",
@@ -710,7 +710,7 @@ func TestConsoleNoSecretsInResponses(t *testing.T) {
 	}
 	needles := []string{
 		"tok-PLAINTEXT", "sha256:deadbeef", "BEGIN RSA PRIVATE KEY", "BEGIN CERTIFICATE",
-		"PRIVATE KEY", "eyJhbGciOi", "MIIsecret", "should-drop", "swapped",
+		"PRIVATE KEY", "eyJhbGciOi", "MII-fixture", "should-drop", "swapped",
 		"postgres://", "token_hash",
 	}
 	for _, target := range targets {
