@@ -398,9 +398,18 @@ func (c *Client) del(url string) (*http.Request, error) {
 
 // —— 第十五轮 R1：入站允许文件登记 ——
 
-// TestInboundAllowlistIsExplicit 入站允许列表必须显式登记且只含告警入口的 HTTP 层。
+// TestInboundAllowlistIsExplicit 入站允许列表必须显式登记，且只含已批准的两处 HTTP 层。
+//
+// 第二十七轮 ADR-024 变更（**既有断言修改，逐条披露**）：
+//
+//	旧值：恰好 1 项 = {alerts/internal/httpapi/server.go}
+//	新值：恰好 2 项 = 上述文件 + internal/console/httpapi/（目录前缀条目）
+//	理由：控制台只读 API 必须监听端口，`http.Server`/`http.ListenAndServe` 属入站符号，
+//	      按第十五轮 R1 的口径必须显式登记；登记范围由 ADR-024 §1 批准，
+//	      并新增 TestConsoleInboundHTTPAllowlistExact 把集合钉为恰好这两项（多一项即失败）。
+//	强度变化：未放宽——仍然是"数量 + 逐项相等 + 文件必须真实存在"三重校验。
 func TestInboundAllowlistIsExplicit(t *testing.T) {
-	want := []string{"alerts/internal/httpapi/server.go"}
+	want := []string{"alerts/internal/httpapi/server.go", "internal/console/httpapi/"}
 	if len(AllowedInboundHTTPFiles) != len(want) {
 		t.Fatalf("入站允许列表应恰好 %d 项，实际 %v", len(want), AllowedInboundHTTPFiles)
 	}

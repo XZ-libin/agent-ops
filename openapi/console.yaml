@@ -1,0 +1,297 @@
+openapi: 3.0.3
+info:
+  title: Agent Ops 控制台只读 API
+  version: "v1"
+  description: |
+    只读接口集合（第二十七轮 C1/C3，契约见 docs/adr/ADR-024-控制台只读API.md）。
+    本文件本轮为**手写**：自动生成需要新增 protoc 插件（外部二进制，本轮禁止）。
+    漂移由两条守卫防住：
+      - TestConsoleOpenAPIMatchesRoutes：paths 集合与 internal/console/httpapi 的路由表完全相同；
+      - TestConsoleSchemaMatchesProto：components.schemas 的字段与 proto 消息字段一一对应。
+    编码约定：protojson(UseProtoNames) —— 键名为 proto 原样 snake_case；
+    64 位整数序列化为**字符串**；Timestamp 序列化为 RFC3339 字符串；枚举为名称字符串。
+    未纳入本契约的 `ErrorEnvelope` 属传输层错误信封（ADR-024 §4），不是领域契约消息。
+servers:
+  - url: http://127.0.0.1:8080
+    description: 本机运行（见 docs/ops/console-readonly-api.md）
+security:
+  - bearerJwt: []
+tags:
+  - name: console
+    description: 控制台只读查询
+paths:
+  /v1/health:
+    get:
+      tags: [console]
+      operationId: getHealth
+      summary: 健康探测
+      responses:
+        "200":
+          description: 服务与数据库状态
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HealthView" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/nodes:
+    get:
+      tags: [console]
+      operationId: listNodes
+      summary: 节点列表（内部封顶 200 行）
+      responses:
+        "200":
+          description: 节点摘要数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/NodeView" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/nodes/{node_id}:
+    get:
+      tags: [console]
+      operationId: getNode
+      summary: 单个节点摘要
+      parameters:
+        - name: node_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: 节点摘要
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NodeView" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /v1/approvals:
+    get:
+      tags: [console]
+      operationId: listApprovals
+      summary: 审批列表（以 approval_id 为游标，升序）
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          description: 默认 50，上限 200；0、负数、超过 200 返回 400
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+        - name: cursor
+          in: query
+          description: 上一页最后一条 approval_id（返回严格大于它的记录）
+          schema: { type: string }
+      responses:
+        "200":
+          description: 审批摘要数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ApprovalView" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/approvals/{approval_id}:
+    get:
+      tags: [console]
+      operationId: getApproval
+      summary: 单个审批摘要
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: 审批摘要
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalView" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /v1/audit/events:
+    get:
+      tags: [console]
+      operationId: listAuditEvents
+      summary: 审计事件（seq 游标升序；payload 为白名单投影）
+      parameters:
+        - name: after_seq
+          in: query
+          description: 从该 seq 之后开始（含 0 表示从头）
+          schema: { type: string, pattern: '^[0-9]+$' }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+      responses:
+        "200":
+          description: 审计事件数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AuditEventView" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/audit/verify:
+    get:
+      tags: [console]
+      operationId: verifyAuditChain
+      summary: 审计哈希链校验结果（不回显 payload）
+      responses:
+        "200":
+          description: 校验结论
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuditVerifyResult" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/adapters:
+    get:
+      tags: [console]
+      operationId: listAdapters
+      summary: 能力清单（只读描述）
+      responses:
+        "200":
+          description: 能力清单数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdapterManifestView" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/policy:
+    get:
+      tags: [console]
+      operationId: getPolicy
+      summary: 有效策略摘要（不含规则内容与任何凭据）
+      responses:
+        "200":
+          description: 策略摘要
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PolicyView" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+components:
+  securitySchemes:
+    bearerJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        生产：OIDC id_token，仅 RS256；iss/aud 精确匹配；exp 必填；kid 必须在 JWKS 中；
+        时钟偏差容忍 60 秒；拒绝静态令牌。测试：合成 JWKS 夹具或测试静态令牌。
+        鉴权失败一律 401，不回显失败原因。
+  responses:
+    Unauthorized:
+      description: 鉴权失败（不区分原因）
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    NotFound:
+      description: 资源或路径不存在
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    BadRequest:
+      description: 查询参数不合法
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  schemas:
+    HealthView:
+      type: object
+      additionalProperties: false
+      properties:
+        status: { type: string, enum: [ok, degraded] }
+        db_ok: { type: boolean }
+        schema_version: { type: string, format: int64 }
+    NodeView:
+      type: object
+      additionalProperties: false
+      properties:
+        node_id: { type: string }
+        status: { type: string, enum: [online, offline, revoked] }
+        last_seen: { type: string, format: date-time }
+        cert_serial: { type: string }
+        cert_state: { type: string, enum: ["", issued, active, superseded, revoked] }
+        cert_not_after: { type: string, format: date-time }
+        cert_confirmed_at: { type: string, format: date-time }
+    ApprovalView:
+      type: object
+      additionalProperties: false
+      properties:
+        approval_id: { type: string }
+        capability: { type: string }
+        tier: { type: string }
+        status: { type: string }
+        requester: { type: string }
+        approver: { type: string }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        request_hash: { type: string }
+    AuditEventView:
+      type: object
+      additionalProperties: false
+      properties:
+        seq: { type: string, format: int64 }
+        id: { type: string }
+        actor: { type: string }
+        action: { type: string }
+        target: { type: string }
+        created_at: { type: string, format: date-time }
+        payload:
+          type: object
+          additionalProperties: { type: string }
+          description: 白名单投影结果（仅 ADR-024 §5 登记的键，且仅标量值）
+    AuditVerifyResult:
+      type: object
+      additionalProperties: false
+      properties:
+        ok: { type: boolean }
+        first_bad_seq: { type: string, format: int64 }
+        reason:
+          type: string
+          enum:
+            - VERIFY_REASON_UNSPECIFIED
+            - VERIFY_REASON_OK
+            - VERIFY_REASON_HASH_MISMATCH
+            - VERIFY_REASON_SEQ_GAP
+            - VERIFY_REASON_INTERNAL_ERROR
+        events_total: { type: string, format: int64 }
+    AdapterManifestView:
+      type: object
+      additionalProperties: false
+      properties:
+        adapter: { type: string }
+        capability: { type: string }
+        tier: { type: string }
+        destructive: { type: boolean }
+        read_only: { type: boolean }
+    PolicyView:
+      type: object
+      additionalProperties: false
+      properties:
+        decision_for_tier:
+          type: object
+          additionalProperties: { type: string }
+        environment_min_tier:
+          type: object
+          additionalProperties: { type: string }
+        multi_impact_min_tier: { type: string }
+        not_rollbackable_min_tier: { type: string }
+        freeze_window_min_tier: { type: string }
+        hard_deny_rules: { type: string, format: int64 }
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error]
+      description: 传输层错误信封（非领域契约；message 取自固定文本表）
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [unauthorized, not_found, method_not_allowed, bad_request, internal]
+            message: { type: string }

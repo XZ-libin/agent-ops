@@ -44,8 +44,14 @@ var AllowedHTTPFiles = []string{
 // `http.ListenAndServe` 等入站符号只允许出现在下列文件中；
 // 其他文件出现入站符号一律失败（fail-closed）。
 // 入站允许文件同样受**出站**规则约束：不得出现任何出站调用。
+//
+// 第二十七轮 ADR-024 的登记例外：新增控制台只读 API 的 HTTP 层目录
+// `internal/console/httpapi/`（条目以 "/" 结尾 = 目录前缀匹配）。
+// 该集合被 TestConsoleInboundHTTPAllowlistExact 钉为**恰好这两项**，
+// 任何新增都必须再来一份 ADR。
 var AllowedInboundHTTPFiles = []string{
 	"alerts/internal/httpapi/server.go",
+	"internal/console/httpapi/",
 }
 
 // AllowedMethods 白名单文件内允许的 HTTP 方法（只读）。
@@ -187,7 +193,7 @@ func ScanRepo(root string) ([]Violation, error) {
 		}
 
 		// 第一层：AST 判定（import 与 URL 拼接）。
-		astViolations, aerr := scanAST(rel, data, allowed[rel], inboundAllowed[rel])
+		astViolations, aerr := scanAST(rel, data, allowed[rel], inboundAllowedFor(inboundAllowed, rel))
 		if aerr != nil {
 			return fmt.Errorf("repoguard：解析 %s 失败：%w", rel, aerr)
 		}
@@ -210,6 +216,23 @@ func ScanRepo(root string) ([]Violation, error) {
 }
 
 // scanAST 对单个文件做 AST 判定。
+// inboundAllowedFor 判断 rel 是否被入站白名单允许。
+//
+// 条目以 "/" 结尾时按**目录前缀**匹配（ADR-024 的控制台 HTTP 层就是一个目录级条目，
+// 该目录下的每个文件都要暴露监听符号，逐个登记只会让清单更容易漏项）；
+// 其余条目保持**精确文件路径**匹配，语义与第十五轮一致。
+func inboundAllowedFor(set map[string]bool, rel string) bool {
+	if set[rel] {
+		return true
+	}
+	for entry := range set {
+		if strings.HasSuffix(entry, "/") && strings.HasPrefix(rel, entry) {
+			return true
+		}
+	}
+	return false
+}
+
 func scanAST(rel string, data []byte, isAllowed, isInboundAllowed bool) ([]Violation, error) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, rel, data, parser.SkipObjectResolution)

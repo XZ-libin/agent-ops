@@ -84,6 +84,17 @@ CI（`.github/workflows/ci.yml`）固定使用下列版本。**未引入任何�
 
 ## 下载记录
 
+### 第二十七轮：**本轮无新外部二进制；新增一个 Go 依赖（守卫用）**
+
+- 控制台只读 API 的契约一致性守卫需要解析 `openapi/console.yaml`，因此根模块新增依赖
+  `gopkg.in/yaml.v3 v3.0.1` —— 与 `adapters` 模块**同一固定版本**（第二十二轮起已在用），
+  经 Go module proxy 获取、由 `go.sum`/sum.golang.org 校验，**不是二进制下载**，本表规则按
+  第二十二轮 `oklog/ulid` 的先例登记；本机 module cache 已有该版本，本轮未产生新的网络下载；
+- 证书与令牌全部使用 Go 标准库（`crypto/rsa`、`crypto/sha256`、`encoding/base64`、
+  `encoding/json`），**未引入任何第三方 JWT/JWKS 库**（沿用 ADR-019 的裁决）；
+- 测试夹具的 RSA 密钥与 JWKS **运行时生成、仅存内存**，不落盘、不入数据库；
+- 未新增任何外部二进制：`kubectl`/`kind`/`buf`/`go` 版本与校验值全部沿用本表既有登记。
+
 ### 第二十五轮（T1）：**修正登记值，无新增外部二进制。**
 
 - **darwin/arm64 kubectl v1.31.4 的 SHA-256 登记错误已修正**：

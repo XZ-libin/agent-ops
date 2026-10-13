@@ -1,0 +1,144 @@
+// 控制台只读 API 的响应契约（第二十七轮 C1，见 ADR-024）。
+//
+// 本文件**只含消息与枚举**，没有任何 service，也没有任何写方法：
+// 控制台的边界是"只读"，写路径需要另立 ADR（ADR-024 §8）。
+//
+// 字段取舍原则：
+//   - 不回传证书 PEM、CSR PEM、私钥、令牌明文或哈希、签名值、连接串；
+//   - `last_seen` 一律取**服务端接收时间**（received_at），不采信节点自报的 sent_at
+//     （ADR-021：节点时钟不可信）；
+//   - 审计 `payload` 是**白名单投影**后的字符串映射，不回传原始 jsonb（ADR-024 §5）；
+//   - 枚举与层级用 string 承载其**序列化名**，与 contract/v1 的取值保持一致，
+//     但不引入跨包依赖（视图层解耦，proto 文件仍可独立演进）。
+
+syntax = "proto3";
+
+package agent_ops.console.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/console/v1;consolev1";
+
+// NodeView 节点摘要。不含证书内容，只有有效期摘要字段。
+message NodeView {
+  // node_id 节点标识（nod_<ULID>）。
+  string node_id = 1;
+  // status 节点状态：online / offline / revoked（与 nodestore 一致）。
+  string status = 2;
+  // last_seen 服务端最后一次收到该节点心跳的时刻（received_at）。
+  google.protobuf.Timestamp last_seen = 3;
+  // cert_serial 当前活跃证书的序列号（公开标识符，非秘密材料）。
+  string cert_serial = 4;
+  // cert_state 证书状态机取值：issued / active / superseded / revoked；无记录为空串。
+  string cert_state = 5;
+  // cert_not_after 证书有效期上限（工程默认 7 天，待确认）。
+  google.protobuf.Timestamp cert_not_after = 6;
+  // cert_confirmed_at 节点首次以该序列号心跳确认的时刻；未确认为 null。
+  google.protobuf.Timestamp cert_confirmed_at = 7;
+}
+
+// ApprovalView 审批记录摘要。不含原始请求体（只给 request_hash）。
+message ApprovalView {
+  // approval_id 审批标识。
+  string approval_id = 1;
+  // capability 被审批的能力名。
+  string capability = 2;
+  // tier 能力风险等级序列化名（与 contract/v1 RiskTier 一致）。
+  string tier = 3;
+  // status pending / approved / rejected / expired / executing / consumed / abandoned。
+  string status = 4;
+  // requester 发起者（审批记录的 actor）。
+  string requester = 5;
+  // approver 决策者（decided_by；未决为空串）。
+  string approver = 6;
+  // created_at 创建时刻。
+  google.protobuf.Timestamp created_at = 7;
+  // expires_at 过期时刻。
+  google.protobuf.Timestamp expires_at = 8;
+  // request_hash 请求摘要（用于去重与审计关联，不可反推请求体）。
+  string request_hash = 9;
+}
+
+// AuditEventView 审计事件（payload 为白名单投影结果）。
+message AuditEventView {
+  // seq 链上单调序号（游标分页的依据）。
+  int64 seq = 1;
+  // id 事件标识。
+  string id = 2;
+  // actor 行为主体。
+  string actor = 3;
+  // action 动作名（下游按字面值消费，见 ADR-023 §5 的稳定性约定）。
+  string action = 4;
+  // target 作用对象。
+  string target = 5;
+  // created_at 事件写入时刻。
+  google.protobuf.Timestamp created_at = 6;
+  // payload 白名单投影后的键值（仅 ADR-024 §5 登记的键；其余丢弃）。
+  map<string, string> payload = 7;
+}
+
+// VerifyReason 链校验结论的原因码（固定枚举，不回显内部错误文本）。
+enum VerifyReason {
+  // VERIFY_REASON_UNSPECIFIED 未设置。
+  VERIFY_REASON_UNSPECIFIED = 0;
+  // VERIFY_REASON_OK 整条链一致。
+  VERIFY_REASON_OK = 1;
+  // VERIFY_REASON_HASH_MISMATCH 记录哈希与链上重算值不一致。
+  VERIFY_REASON_HASH_MISMATCH = 2;
+  // VERIFY_REASON_SEQ_GAP seq 不连续或非单调。
+  VERIFY_REASON_SEQ_GAP = 3;
+  // VERIFY_REASON_INTERNAL_ERROR 读取或计算失败（只报码，不回显错误内容）。
+  VERIFY_REASON_INTERNAL_ERROR = 4;
+}
+
+// AuditVerifyResult 链校验结果。不含 payload。
+message AuditVerifyResult {
+  // ok 链是否完全一致。
+  bool ok = 1;
+  // first_bad_seq 第一个有问题的 seq；ok 为 true 时是 0。
+  int64 first_bad_seq = 2;
+  // reason 结论码。
+  VerifyReason reason = 3;
+  // events_total 参与校验的事件数（可观测，不含内容）。
+  int64 events_total = 4;
+}
+
+// AdapterManifestView 能力清单条目（只读描述，不含任何凭据）。
+message AdapterManifestView {
+  // adapter 适配器名：linux / docker / kubernetes。
+  string adapter = 1;
+  // capability 能力名。
+  string capability = 2;
+  // tier 风险等级序列化名。
+  string tier = 3;
+  // destructive 是否破坏性能力。
+  bool destructive = 4;
+  // read_only 是否只读能力。
+  bool read_only = 5;
+}
+
+// PolicyView 有效策略摘要。不含密钥、令牌或连接串。
+message PolicyView {
+  // decision_for_tier 等级→决策映射（序列化名成对给出，便于稳定消费）。
+  map<string, string> decision_for_tier = 1;
+  // environment_min_tier 环境→最低等级映射。
+  map<string, string> environment_min_tier = 2;
+  // multi_impact_min_tier 多实例影响范围的等级下限。
+  string multi_impact_min_tier = 3;
+  // not_rollbackable_min_tier 不可回滚操作的等级下限。
+  string not_rollbackable_min_tier = 4;
+  // freeze_window_min_tier 冻结窗口内写操作的等级下限。
+  string freeze_window_min_tier = 5;
+  // hard_deny_rules 硬拒绝规则条数（只给数量，规则内容不在只读接口暴露）。
+  int64 hard_deny_rules = 6;
+}
+
+// HealthView 健康探测。
+message HealthView {
+  // status 服务状态：ok / degraded。
+  string status = 1;
+  // db_ok 数据库连通且必要表可读。
+  bool db_ok = 2;
+  // schema_version 已应用的迁移版本（0 表示未取到）。
+  int64 schema_version = 3;
+}
