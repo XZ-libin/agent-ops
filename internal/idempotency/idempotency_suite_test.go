@@ -12,8 +12,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // fakeRecorder 捕获审计事件的测试替身（实现 audit.Recorder）。

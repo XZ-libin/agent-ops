@@ -22,9 +22,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/nodecerts"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodecerts"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
 )
 
 // —— 辅助（供本文件全部用例使用）——

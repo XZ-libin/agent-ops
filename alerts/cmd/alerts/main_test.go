@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
 )
 
 // testEnv 构造测试环境变量（明显的假密钥）。

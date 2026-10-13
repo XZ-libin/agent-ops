@@ -23,7 +23,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
 )
 
 // 默认表名（一律 test_ 前缀；生产表名待运维确认）。

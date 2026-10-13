@@ -20,7 +20,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/audit"
 )
 
 // DefaultTTL 幂等键默认有效期 24 小时（默认值，待运维确认）。

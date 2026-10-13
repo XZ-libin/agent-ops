@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/nodehealth"
+	"github.com/XZ-libin/agent-ops/internal/nodehealth"
 )
 
 // newHealthTracker 构建注入了固定时钟的心跳判定器（D3 的 revoked 终态用）。

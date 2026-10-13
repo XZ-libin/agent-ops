@@ -20,8 +20,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
 )
 
 // fixedNow 测试固定时钟。

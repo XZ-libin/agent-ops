@@ -7,11 +7,11 @@ import (
 	"sync"
 	"testing"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/internal/exec"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // fakeRunner 本地模拟 Runner：记录调用、返回预设输出；不执行任何真实命令。

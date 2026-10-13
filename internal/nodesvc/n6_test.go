@@ -15,12 +15,12 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/nodecerts"
-	"github.com/ORG/agent-ops/internal/nodehealth"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/internal/nodestore"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/nodecerts"
+	"github.com/XZ-libin/agent-ops/internal/nodehealth"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // testClock 可控注入时钟。

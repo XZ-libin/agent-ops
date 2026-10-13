@@ -10,9 +10,9 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // testDSNEnv 测试数据库连接串环境变量；未设置时使用 testdb 的默认值

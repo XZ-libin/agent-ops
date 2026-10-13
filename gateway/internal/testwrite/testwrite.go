@@ -29,11 +29,11 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"gopkg.in/yaml.v3"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
-	"github.com/ORG/agent-ops/internal/exec"
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 //go:embed manifest.yaml

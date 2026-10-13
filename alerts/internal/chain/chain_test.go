@@ -17,12 +17,12 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/alerts/internal/consumer"
-	"github.com/ORG/agent-ops/alerts/internal/httpapi"
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
-	"github.com/ORG/agent-ops/alerts/internal/planner"
-	"github.com/ORG/agent-ops/alerts/internal/store"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/alerts/internal/consumer"
+	"github.com/XZ-libin/agent-ops/alerts/internal/httpapi"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/planner"
+	"github.com/XZ-libin/agent-ops/alerts/internal/store"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // 仅测试的固定假密钥（明显的测试值，非真实凭据）。

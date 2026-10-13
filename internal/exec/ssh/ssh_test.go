@@ -15,7 +15,7 @@ import (
 
 	gossh "golang.org/x/crypto/ssh"
 
-	"github.com/ORG/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/exec"
 )
 
 // —— 内嵌 SSH 测试服务器（不依赖外部 sshd / Docker）——

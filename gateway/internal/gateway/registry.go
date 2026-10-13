@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ORG/agent-ops/gateway/internal/approvals"
+	"github.com/XZ-libin/agent-ops/gateway/internal/approvals"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // Handler 已注册能力的具体执行逻辑（由接入方接线，如 internal/linuxwire）。

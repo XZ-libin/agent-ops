@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/audit"
 )
 
 // DefaultLocalDSN 本地开发/测试的默认连接串（占位值，非真实凭据）。

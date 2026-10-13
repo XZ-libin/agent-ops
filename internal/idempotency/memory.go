@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"sync"
 
-	"github.com/ORG/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/audit"
 )
 
 // MemoryStore 幂等键内存实现。

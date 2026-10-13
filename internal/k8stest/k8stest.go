@@ -20,8 +20,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/testdb"
-	"github.com/ORG/agent-ops/internal/toolpin"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/internal/toolpin"
 )
 
 const (

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/toolpin"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/toolpin"
 )
 
 // pinnedKubectl 返回与 docs/tooling.md 登记版本一致的 kubectl（第二十五轮 T2b）。

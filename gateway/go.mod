@@ -1,21 +1,19 @@
-// TODO(待决策：组织域名)：模块路径中的 ORG 为占位符，
-// 确定组织域名后替换为真实组织。
-module github.com/ORG/agent-ops/gateway
+// 模块路径已确定为 github.com/XZ-libin/agent-ops，决定日期 2026-10-13。
+module github.com/XZ-libin/agent-ops/gateway
 
 go 1.27
 
-// TODO(待决策：组织域名，确定后移除本 replace 指令)。
-replace github.com/ORG/agent-ops/contract => ../contract
+replace github.com/XZ-libin/agent-ops/contract => ../contract
 
-replace github.com/ORG/agent-ops/adapters => ../adapters
+replace github.com/XZ-libin/agent-ops/adapters => ../adapters
 
 // 共享内核（ADR-008）：internal/{policy,idempotency,audit,exec,validation}。
-replace github.com/ORG/agent-ops => ../
+replace github.com/XZ-libin/agent-ops => ../
 
 require (
-	github.com/ORG/agent-ops v0.0.0-00010101000000-000000000000
-	github.com/ORG/agent-ops/adapters v0.0.0-00010101000000-000000000000
-	github.com/ORG/agent-ops/contract v0.0.0-00010101000000-000000000000
+	github.com/XZ-libin/agent-ops v0.0.0-00010101000000-000000000000
+	github.com/XZ-libin/agent-ops/adapters v0.0.0-00010101000000-000000000000
+	github.com/XZ-libin/agent-ops/contract v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v5 v5.11.0
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12

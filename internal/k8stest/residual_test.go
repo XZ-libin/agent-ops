@@ -24,7 +24,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // ResidualViolations 返回当前的全部残留（kind 集群 / 测试容器 / test_run_* schema）。

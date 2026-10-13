@@ -22,7 +22,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
 )
 
 // 重试与死信参数（第十六轮 R3，裁决）。

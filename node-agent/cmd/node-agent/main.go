@@ -27,11 +27,11 @@ import (
 	"syscall"
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/node-agent/internal/agent"
-	"github.com/ORG/agent-ops/node-agent/internal/enrollclient"
-	"github.com/ORG/agent-ops/node-agent/internal/identity"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/agent"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/enrollclient"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/identity"
 )
 
 // version 节点代理版本（随构建注入或默认值）。

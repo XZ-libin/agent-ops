@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // repoRoot 从当前目录向上寻找仓库根（含 go.work）。

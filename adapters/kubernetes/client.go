@@ -18,7 +18,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // —— 端点白名单（第十三轮 K1）——

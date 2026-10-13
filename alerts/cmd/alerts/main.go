@@ -24,19 +24,19 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/alerts/internal/consumer"
-	"github.com/ORG/agent-ops/alerts/internal/diagcaps"
-	"github.com/ORG/agent-ops/alerts/internal/executor"
-	"github.com/ORG/agent-ops/alerts/internal/httpapi"
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
-	"github.com/ORG/agent-ops/alerts/internal/planner"
-	"github.com/ORG/agent-ops/alerts/internal/redrive"
-	"github.com/ORG/agent-ops/alerts/internal/store"
-	"github.com/ORG/agent-ops/alerts/internal/worker"
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/alerts/internal/consumer"
+	"github.com/XZ-libin/agent-ops/alerts/internal/diagcaps"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
+	"github.com/XZ-libin/agent-ops/alerts/internal/httpapi"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/planner"
+	"github.com/XZ-libin/agent-ops/alerts/internal/redrive"
+	"github.com/XZ-libin/agent-ops/alerts/internal/store"
+	"github.com/XZ-libin/agent-ops/alerts/internal/worker"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // workerAuditTable worker 在测试模式使用的审计表（test_ 前缀，绝不写生产表）。

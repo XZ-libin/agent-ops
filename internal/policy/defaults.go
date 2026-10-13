@@ -3,7 +3,7 @@ package policy
 import (
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 )
 
 // DefaultConfig 返回内置策略配置（等级→决策映射与各上下文等级下限）。

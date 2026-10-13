@@ -26,8 +26,8 @@ import (
 	"testing"
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/node-agent/internal/enrollclient"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/enrollclient"
 )
 
 // selfSignedNodeCertForTest 生成"自签名的节点证书"用于进程级测试。

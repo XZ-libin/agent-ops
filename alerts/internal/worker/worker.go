@@ -23,10 +23,10 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/alerts/internal/consumer"
-	"github.com/ORG/agent-ops/alerts/internal/executor"
-	"github.com/ORG/agent-ops/alerts/internal/planner"
-	"github.com/ORG/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/alerts/internal/consumer"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
+	"github.com/XZ-libin/agent-ops/alerts/internal/planner"
+	"github.com/XZ-libin/agent-ops/internal/audit"
 )
 
 // DefaultLockKey advisory lock 的固定键（ASCII "AGOPSWK1"）。

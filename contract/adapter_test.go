@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 )
 
 // mockAdapter 是本地模拟，仅用于校验 Adapter 接口形状；

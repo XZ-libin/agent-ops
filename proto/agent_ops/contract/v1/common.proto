@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package agent_ops.contract.v1;
 
-option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+option go_package = "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
 
 // 环境的固定枚举（决策：不允许自由输入）。
 // JSON 编码按 proto3 规范使用值名（如 "ENVIRONMENT_PROD"）；

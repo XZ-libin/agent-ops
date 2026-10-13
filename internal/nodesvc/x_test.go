@@ -22,8 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
 )
 
 // revokeNode 注册并主动吊销一个节点，返回（node_id, 序列号, 证书 DER）。

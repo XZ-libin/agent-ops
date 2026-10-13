@@ -21,9 +21,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/nodecerts"
-	"github.com/ORG/agent-ops/internal/nodemigrate"
-	"github.com/ORG/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodecerts"
+	"github.com/XZ-libin/agent-ops/internal/nodemigrate"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
 )
 
 // certState 读取证书状态（不存在返回空串）。

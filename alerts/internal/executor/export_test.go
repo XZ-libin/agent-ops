@@ -7,9 +7,9 @@ package executor
 import (
 	"testing"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // NewExecEnvCluster 建立真实 PG 测试环境（独立 run schema）+ 执行器 + 审计接收端。

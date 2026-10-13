@@ -34,8 +34,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/policy"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/policy"
 )
 
 // 默认表名（测试用；生产表名待运维确认）。

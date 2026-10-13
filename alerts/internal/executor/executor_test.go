@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // TestExecuteLinuxPlanRealPath（P4 ①）linux 画像的计划通过 **sshd 测试容器**

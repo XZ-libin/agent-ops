@@ -1,18 +1,16 @@
-// TODO(待决策：组织域名)：模块路径中的 ORG 为占位符，
-// 确定组织域名后替换为真实组织。
-module github.com/ORG/agent-ops/alerts
+// 模块路径已确定为 github.com/XZ-libin/agent-ops，决定日期 2026-10-13。
+module github.com/XZ-libin/agent-ops/alerts
 
 go 1.27
 
-// TODO(待决策：组织域名，确定后移除本 replace 指令)。
-replace github.com/ORG/agent-ops/contract => ../contract
+replace github.com/XZ-libin/agent-ops/contract => ../contract
 
 // 共享内核（ADR-008）：internal/testdb（测试库名校验与每轮 schema）。
-replace github.com/ORG/agent-ops => ../
+replace github.com/XZ-libin/agent-ops => ../
 
 require (
-	github.com/ORG/agent-ops v0.0.0-00010101000000-000000000000
-	github.com/ORG/agent-ops/contract v0.0.0-00010101000000-000000000000
+	github.com/XZ-libin/agent-ops v0.0.0-00010101000000-000000000000
+	github.com/XZ-libin/agent-ops/contract v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v5 v5.11.0
 	gopkg.in/yaml.v3 v3.0.1
 )

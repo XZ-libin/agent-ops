@@ -13,17 +13,17 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/adapters/linux"
-	"github.com/ORG/agent-ops/gateway/internal/approvals"
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/exec"
-	"github.com/ORG/agent-ops/internal/exec/ssh"
-	"github.com/ORG/agent-ops/internal/exec/ssh/sshdtest"
-	"github.com/ORG/agent-ops/internal/idempotency"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/adapters/linux"
+	"github.com/XZ-libin/agent-ops/gateway/internal/approvals"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh/sshdtest"
+	"github.com/XZ-libin/agent-ops/internal/idempotency"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // TestIntegrationApprovedWriteMarkerAndRollback 第九轮 sshd 容器端到端集成（D3）：

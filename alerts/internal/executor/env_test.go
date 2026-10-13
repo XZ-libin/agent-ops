@@ -11,14 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/adapters/docker"
-	"github.com/ORG/agent-ops/adapters/linux"
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/exec/ssh"
-	"github.com/ORG/agent-ops/internal/exec/ssh/sshdtest"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/adapters/docker"
+	"github.com/XZ-libin/agent-ops/adapters/linux"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh/sshdtest"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // auditAdapter 把 internal/audit.Store 适配为执行器的 AuditSink（避免执行器耦合审计包）。

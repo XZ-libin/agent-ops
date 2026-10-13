@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // newTestStore 建立真实 PG 存储（每轮独立 schema；PG 不可用则 skip）。

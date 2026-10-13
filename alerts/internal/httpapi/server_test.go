@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
-	"github.com/ORG/agent-ops/alerts/internal/planner"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/planner"
 )
 
 // 仅测试的固定假密钥（明显的测试值，非真实凭据）。

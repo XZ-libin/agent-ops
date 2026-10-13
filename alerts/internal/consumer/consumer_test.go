@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
-	"github.com/ORG/agent-ops/alerts/internal/store"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/store"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // testAlert 构造测试告警（明显的测试假值）。

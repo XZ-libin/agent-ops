@@ -16,9 +16,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/nodehealth"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodehealth"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
 )
 
 // NodeTransitions 节点域**全部**状态迁移及其对应审计动作。

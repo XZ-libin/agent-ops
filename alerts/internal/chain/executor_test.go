@@ -19,16 +19,16 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/adapters/docker"
-	"github.com/ORG/agent-ops/adapters/linux"
-	"github.com/ORG/agent-ops/alerts/internal/executor"
-	"github.com/ORG/agent-ops/alerts/internal/planner"
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/exec/ssh"
-	"github.com/ORG/agent-ops/internal/exec/ssh/sshdtest"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/adapters/docker"
+	"github.com/XZ-libin/agent-ops/adapters/linux"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
+	"github.com/XZ-libin/agent-ops/alerts/internal/planner"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh/sshdtest"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // —— 审计接线（把 internal/audit.Store 适配为执行器需要的 AuditSink）——

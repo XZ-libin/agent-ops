@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 )
 
 // 集成测试使用的固定镜像与容器名（仅测试；版本固定，避免漂移）。

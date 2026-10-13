@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // newTestRedriver 建立真实 PG 重投环境（独立 run schema），并造一条 dead 事件。

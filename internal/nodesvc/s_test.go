@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/internal/nodecerts"
-	"github.com/ORG/agent-ops/internal/nodestore"
-	"github.com/ORG/agent-ops/internal/nodesweep"
+	"github.com/XZ-libin/agent-ops/internal/nodecerts"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodesweep"
 )
 
 // newSweeper 用 Service 的依赖构建扫描器。

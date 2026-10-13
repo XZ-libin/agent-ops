@@ -30,13 +30,13 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/nodecerts"
-	"github.com/ORG/agent-ops/internal/nodehealth"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/internal/nodemigrate"
-	"github.com/ORG/agent-ops/internal/nodestore"
-	"github.com/ORG/agent-ops/internal/nodesweep"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/nodecerts"
+	"github.com/XZ-libin/agent-ops/internal/nodehealth"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodemigrate"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodesweep"
 )
 
 // 审计动作（N6）。

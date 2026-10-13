@@ -3,7 +3,7 @@ package registry
 import (
 	"testing"
 
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // TestValidCapabilityName 注册侧名称校验（规则唯一来源 internal/validation）。

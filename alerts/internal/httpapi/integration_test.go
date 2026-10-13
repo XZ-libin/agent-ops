@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
-	"github.com/ORG/agent-ops/alerts/internal/store"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/store"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // TestIntegrationAlertsIngest 第十四轮 A2 集成测试：

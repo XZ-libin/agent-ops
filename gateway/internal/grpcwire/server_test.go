@@ -12,9 +12,9 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
 )
 
 // —— G1 错误码映射（固定，不随实现漂移） ——

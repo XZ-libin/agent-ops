@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // allowedCommands 适配器允许的固定只读命令集合（契约测试白名单）。

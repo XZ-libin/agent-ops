@@ -21,17 +21,17 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/ORG/agent-ops/adapters/docker"
-	"github.com/ORG/agent-ops/alerts/internal/diagcaps"
-	"github.com/ORG/agent-ops/alerts/internal/executor"
-	"github.com/ORG/agent-ops/alerts/internal/worker"
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/exec/ssh"
-	"github.com/ORG/agent-ops/internal/exec/ssh/sshdtest"
-	"github.com/ORG/agent-ops/internal/k8stest"
-	"github.com/ORG/agent-ops/internal/policy"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/adapters/docker"
+	"github.com/XZ-libin/agent-ops/alerts/internal/diagcaps"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
+	"github.com/XZ-libin/agent-ops/alerts/internal/worker"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh/sshdtest"
+	"github.com/XZ-libin/agent-ops/internal/k8stest"
+	"github.com/XZ-libin/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // chainWorkerEnv W2 的完整环境（含 worker 所需组件）。

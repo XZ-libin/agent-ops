@@ -3,7 +3,7 @@ package contract
 import (
 	"context"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 )
 
 // Adapter 是每个组件适配器必须实现的统一接口（开发文档「适配器规范」）。

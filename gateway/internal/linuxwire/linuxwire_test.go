@@ -8,11 +8,11 @@ import (
 
 	"google.golang.org/protobuf/types/known/structpb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/adapters/linux"
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
-	"github.com/ORG/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/adapters/linux"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/internal/exec"
 )
 
 // fakeRunner 本地模拟 Runner（与 adapters/linux 测试同款，此处为最小实现）。

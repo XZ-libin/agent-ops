@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ORG/agent-ops/internal/nodemigrate"
+	"github.com/XZ-libin/agent-ops/internal/nodemigrate"
 )
 
 // TestMigrationUpDownVerified（T3/T4）迁移 Up 与 Down 均已验证。

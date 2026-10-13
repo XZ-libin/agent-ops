@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ORG/agent-ops/alerts/internal/diagcaps"
-	"github.com/ORG/agent-ops/alerts/internal/executor"
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/k8stest"
-	"github.com/ORG/agent-ops/internal/policy"
+	"github.com/XZ-libin/agent-ops/alerts/internal/diagcaps"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/k8stest"
+	"github.com/XZ-libin/agent-ops/internal/policy"
 )
 
 // requestCounter 在 HTTP 层记录真正发出的请求（K1：断言 /secrets 请求数为 0）。

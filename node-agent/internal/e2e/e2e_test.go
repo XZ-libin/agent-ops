@@ -30,16 +30,16 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/nodehealth"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/internal/nodeserver"
-	"github.com/ORG/agent-ops/internal/nodestore"
-	"github.com/ORG/agent-ops/internal/nodesvc"
-	"github.com/ORG/agent-ops/internal/testdb"
-	"github.com/ORG/agent-ops/node-agent/internal/agent"
-	"github.com/ORG/agent-ops/node-agent/internal/enrollclient"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/nodehealth"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/internal/nodeserver"
+	"github.com/XZ-libin/agent-ops/internal/nodestore"
+	"github.com/XZ-libin/agent-ops/internal/nodesvc"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/agent"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/enrollclient"
 )
 
 // baseTime 测试固定时钟起点。

@@ -18,10 +18,10 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"gopkg.in/yaml.v3"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // manifestCapability 清单能力声明（本包所需字段）。

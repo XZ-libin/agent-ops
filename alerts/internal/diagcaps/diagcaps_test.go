@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ORG/agent-ops/alerts/internal/executor"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
 )
 
 // TestFromEnvReadsAllVars 环境读取（含 kubeconfig 与命名空间）。

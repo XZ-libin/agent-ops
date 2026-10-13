@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ORG/agent-ops/alerts/internal/ingest"
+	"github.com/XZ-libin/agent-ops/alerts/internal/ingest"
 )
 
 // DefaultMaxBodyBytes 请求体上限（裁决：64KB）。

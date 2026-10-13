@@ -20,13 +20,13 @@ import (
 
 	gossh "golang.org/x/crypto/ssh"
 
-	"github.com/ORG/agent-ops/adapters/docker"
-	"github.com/ORG/agent-ops/adapters/kubernetes"
-	"github.com/ORG/agent-ops/adapters/linux"
-	"github.com/ORG/agent-ops/alerts/internal/executor"
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/exec"
-	"github.com/ORG/agent-ops/internal/exec/ssh"
+	"github.com/XZ-libin/agent-ops/adapters/docker"
+	"github.com/XZ-libin/agent-ops/adapters/kubernetes"
+	"github.com/XZ-libin/agent-ops/adapters/linux"
+	"github.com/XZ-libin/agent-ops/alerts/internal/executor"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh"
 )
 
 // 环境变量名（仅测试模式使用；生产接线待运维确认）。

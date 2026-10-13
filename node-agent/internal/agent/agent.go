@@ -31,10 +31,10 @@ import (
 
 	"github.com/oklog/ulid/v2"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/nodeidentity"
-	"github.com/ORG/agent-ops/node-agent/internal/enrollclient"
-	"github.com/ORG/agent-ops/node-agent/internal/identity"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/nodeidentity"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/enrollclient"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/identity"
 )
 
 // 显式引用 io（保留用于未来的流式令牌读取；当前由 fs/os 使用）。

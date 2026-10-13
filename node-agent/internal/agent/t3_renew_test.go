@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/node-agent/internal/enrollclient"
-	"github.com/ORG/agent-ops/node-agent/internal/identity"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/enrollclient"
+	"github.com/XZ-libin/agent-ops/node-agent/internal/identity"
 )
 
 // rClock 可控注入时钟（T3 用例）。

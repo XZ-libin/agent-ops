@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ORG/agent-ops/gateway/internal/approvals"
+	"github.com/XZ-libin/agent-ops/gateway/internal/approvals"
 )
 
 // Reconcile 对账（R4 + 第十轮 F2 + 第十一轮 H1）：

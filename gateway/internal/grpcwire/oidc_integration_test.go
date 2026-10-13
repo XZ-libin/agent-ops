@@ -22,14 +22,14 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/approvals"
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
-	"github.com/ORG/agent-ops/gateway/internal/prodcatalog"
-	"github.com/ORG/agent-ops/internal/audit"
-	"github.com/ORG/agent-ops/internal/idempotency"
-	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/XZ-libin/agent-ops/gateway/internal/approvals"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/gateway/internal/prodcatalog"
+	"github.com/XZ-libin/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/internal/idempotency"
+	"github.com/XZ-libin/agent-ops/internal/testdb"
 )
 
 // prodManifestPath 生产能力清单（仓库内相对路径；集成测试从模块目录运行）。

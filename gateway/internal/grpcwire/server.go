@@ -8,10 +8,10 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/approvals"
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/gateway/internal/approvals"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
 )
 
 // Server 执行网关的 gRPC 服务实现（第十轮 G1）。

@@ -8,10 +8,10 @@ import (
 
 	"google.golang.org/protobuf/types/known/structpb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/gateway"
-	"github.com/ORG/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/gateway/internal/gateway"
+	"github.com/XZ-libin/agent-ops/internal/exec"
 )
 
 // fakeRunner 记录 argv 调用的最小 Runner（不执行真实命令）。

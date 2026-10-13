@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/structpb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 )
 
 // TestCanonicalJSONRules ADR-009 逐条规则的行为测试。

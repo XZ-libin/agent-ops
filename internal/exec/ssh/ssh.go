@@ -26,8 +26,8 @@ import (
 
 	gossh "golang.org/x/crypto/ssh"
 
-	"github.com/ORG/agent-ops/internal/exec"
-	"github.com/ORG/agent-ops/internal/validation"
+	"github.com/XZ-libin/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/validation"
 )
 
 // defaultDialTimeout 建立 SSH 连接的默认超时 10s（工程默认，待运维确认）。

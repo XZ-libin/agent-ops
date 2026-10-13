@@ -1,6 +1,6 @@
 package registry
 
-import "github.com/ORG/agent-ops/internal/validation"
+import "github.com/XZ-libin/agent-ops/internal/validation"
 
 // CapabilityNamePattern 能力名称规则（第五轮修正，安全相关）：
 // 只允许小写 ASCII 字母、数字、下划线，以 "." 分段。

@@ -1,6 +1,5 @@
-// TODO(待决策：组织域名)：模块路径中的 ORG 为占位符，
-// 确定组织域名后替换为真实组织。
-module github.com/ORG/agent-ops/contract
+// 模块路径已确定为 github.com/XZ-libin/agent-ops，决定日期 2026-10-13。
+module github.com/XZ-libin/agent-ops/contract
 
 go 1.27
 

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
-	"github.com/ORG/agent-ops/internal/policy"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/XZ-libin/agent-ops/internal/policy"
 )
 
 // TestTerminalStateMapping（F2）计划终态的完整映射：

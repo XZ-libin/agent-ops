@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ORG/agent-ops/internal/toolpin"
+	"github.com/XZ-libin/agent-ops/internal/toolpin"
 )
 
 // ciPlatform CI runner 的平台（`runs-on: ubuntu-latest` → linux/amd64）。

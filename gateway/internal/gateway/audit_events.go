@@ -6,10 +6,10 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/gateway/internal/approvals"
-	"github.com/ORG/agent-ops/internal/audit"
+	"github.com/XZ-libin/agent-ops/gateway/internal/approvals"
+	"github.com/XZ-libin/agent-ops/internal/audit"
 )
 
 // —— 网关审计事件（第八轮约束 7 + 第九轮 R4）——

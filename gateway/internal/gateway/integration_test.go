@@ -9,13 +9,13 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	contractv1 "github.com/XZ-libin/agent-ops/contract/gen/go/agent_ops/contract/v1"
 
-	"github.com/ORG/agent-ops/adapters/linux"
-	"github.com/ORG/agent-ops/internal/exec"
-	"github.com/ORG/agent-ops/internal/exec/ssh"
-	"github.com/ORG/agent-ops/internal/exec/ssh/sshdtest"
-	"github.com/ORG/agent-ops/internal/idempotency"
+	"github.com/XZ-libin/agent-ops/adapters/linux"
+	"github.com/XZ-libin/agent-ops/internal/exec"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh"
+	"github.com/XZ-libin/agent-ops/internal/exec/ssh/sshdtest"
+	"github.com/XZ-libin/agent-ops/internal/idempotency"
 )
 
 // TestGatewayIntegrationSSHD 网关端到端集成测试（D3）：
