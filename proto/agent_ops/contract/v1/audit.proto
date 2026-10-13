@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+import "agent_ops/contract/v1/common.proto";
+import "agent_ops/contract/v1/risk.proto";
+import "google/protobuf/timestamp.proto";
+
+// 审计事件：只追加。独立 schema、独立数据库角色（仅 INSERT），
+// 触发器禁止 UPDATE/DELETE；哈希链锚点定期写入开启对象锁的外部对象存储（ADR-005）。
+message AuditEvent {
+  string id = 1;
+  Actor actor = 2;         // 人或 Agent
+  string action = 3;       // "change.approved"、"capability.execute" 等
+  string target = 4;       // asset_id / plan_id 等
+  RiskTier risk_tier = 5;  // 未显式赋值时为 UNSPECIFIED
+  string before = 6;       // 变更前快照（JSON）
+  string after = 7;        // 变更后快照（JSON）
+  string trace_id = 8;     // 串联告警→诊断→审批→执行→审计
+  google.protobuf.Timestamp ts = 9;
+}

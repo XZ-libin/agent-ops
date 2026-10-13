@@ -1,0 +1,142 @@
+# CI 流水线（第二十轮 C1；第二十一轮按裁决 1 修订为三个 job）。
+#
+# 三个**独立 job**：
+#
+#   gen-check  生成代码一致性（ADR-002 门禁；手改生成文件即失败）
+#   build      全模块编译（go build ./...）
+#   test       go test ./... -v -count=1（禁用缓存），**末尾在同一个 runner 上**
+#              执行残留门禁（make residual-check）
+#
+# 为什么把残留检查**合并进 test job**（第二十一轮裁决 1，见 ADR-020 §1）：
+#   GitHub 托管的 runner 每个 job 都是全新环境，独立的 residual-check job 看不到
+#   test job 产生的任何残留，只能检查它自己——形同虚设。因此真实的残留检测必须与
+#   测试**同一个 runner**，并在测试之后立即执行。分支保护只需把 `test` 设为必需检查。
+#
+# 硬性要求（第二十轮 C1 / 硬性约束 5）：
+#   - **不得**出现 "continue on error"（连字符形式）绕过开关——本文件不设置该键；
+#   - 残留检查步骤**不得**用 if 条件跳过；
+#   - 工具链版本固定（Go 1.27.2 / buf v1.47.2 / kind v0.30.0），来源与 SHA-256
+#     登记见 docs/tooling.md；
+#   - 第三方 Action **钉到 commit SHA**（第二十四轮，不跟随可变 tag）：
+#       actions/checkout@v4  -> 11d5960a326750d5838078e36cf38b85af677262
+#       actions/setup-go@v5  -> 40f1582b2485089dde7abd97c1529aa768e1baff
+#     取值方式：`https://api.github.com/repos/actions/<repo>/commits/<tag>`（官方 API
+#     解析 tag 指向的 commit），登记于 2026-10-13；升级时须重新解析 SHA 并同步本注释。
+#
+# 未在 GitHub 上执行：本文件由本地命令序列逐条模拟验证（见报告），
+# 首次真实运行结果待补充（第二十一轮的前置条件）。
+name: ci
+
+on:
+  push:
+  pull_request:
+
+# 最小权限：CI 只需要读仓库内容。
+permissions:
+  contents: read
+
+env:
+  # 工具链版本固定（docs/tooling.md 已登记）。
+  GO_VERSION: "1.27.2"
+  BUF_VERSION: "v1.47.2"
+  KIND_VERSION: "v0.30.0"
+  KUBECTL_VERSION: "v1.31.4"
+  # 测试数据库（与本地一致：独立库 agent_ops_test，端口 55432；绝不使用 5432）。
+  AGENT_OPS_TEST_DATABASE_URL: "postgres://agent_ops:agent_ops@localhost:55432/agent_ops_test?sslmode=disable"
+
+jobs:
+  # —— 1) 生成代码一致性（ADR-002）——
+  gen-check:
+    name: gen-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          # setup-go 默认按官方 go.dev 清单校验工具链校验和。
+          check-latest: false
+      - name: 生成代码一致性检查（make gen-check）
+        run: make gen-check
+
+  # —— 2) 全模块编译 ——
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: false
+      - name: 编译全部模块（make build）
+        run: make build
+
+  # —— 3) 单元/集成测试 + 同 runner 残留检查 ——
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: agent_ops
+          POSTGRES_PASSWORD: agent_ops
+          POSTGRES_DB: agent_ops_test
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U agent_ops -d agent_ops_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: false
+      # kind：经 Go module proxy 构建（docs/tooling.md 登记项，非二进制下载）。
+      - name: 安装 kind（${{ env.KIND_VERSION }}）
+        run: |
+          go install sigs.k8s.io/kind@${{ env.KIND_VERSION }}
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      # kubectl：**必须**从 docs/tooling.md 读取登记在案的 SHA-256 并校验（T4）。
+      # 规则（硬性约束 6）：SHA 只能来自人工确认的官方校验值（登记于 tooling.md），
+      # 实现者不得自行填写；本文件在 SHA 回填前会被 TestCI2 守卫阻断（预期）。
+      - name: 安装并校验 kubectl（${{ env.KUBECTL_VERSION }}）
+        run: |
+          set -euo pipefail
+          base="https://dl.k8s.io/release/${{ env.KUBECTL_VERSION }}/bin/linux/amd64"
+          curl -fsSLo /tmp/kubectl "$base/kubectl"
+          # 从 docs/tooling.md 提取 kubectl linux/amd64 的 SHA-256（登记表的第 4 列）。
+          # 占位符（待人工提供）时提取为空 → sha256sum 将失败，job 中止（fail-closed）。
+          # 表格行：| kubectl | v1.31.4 | linux/amd64 | <SHA> | <URL> |
+          # 用 '|' 分割后：$2=名称 $3=版本 $4=平台 $5=SHA-256 $6=URL。
+          expected="$(
+            awk -F'|' '/^[[:space:]]*\| kubectl \|/ && $4 ~ /linux\/amd64/ {
+              gsub(/[ `]/, "", $5); print $5; exit }' docs/tooling.md
+          )"
+          if [ -z "$expected" ] || [[ "$expected" == *待人工提供* ]]; then
+            echo "kubectl linux/amd64 SHA-256 未登记（docs/tooling.md）——合并阻断，请人工回填" >&2
+            exit 1
+          fi
+          echo "$expected  /tmp/kubectl" | sha256sum -c -
+          install -m 0755 /tmp/kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+      - name: 等待 PostgreSQL 就绪
+        run: |
+          for i in $(seq 1 30); do
+            if pg_isready -h 127.0.0.1 -p 55432 -U agent_ops -d agent_ops_test; then exit 0; fi
+            sleep 2
+          done
+          echo "PostgreSQL 未就绪" >&2
+          exit 1
+      - name: 单元与集成测试（go test ./... -v -count=1）
+        run: make test-verbose
+      # 残留门禁（第二十一轮裁决 1）：与测试**同一个 runner**，在测试之后立即执行，
+      # 因此能看到本次测试真实遗留的 kind 集群 / 测试容器 / test_run_* schema。
+      # 这是唯一的真实残留检测点；不得移到独立 job（那样看不到任何遗留）。
+      - name: 残留门禁（make residual-check）
+        run: make residual-check

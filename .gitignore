@@ -1,0 +1,15 @@
+.gen-check/
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+dist/
+web/dist/
+*.log
+.DS_Store
+# go build 落盘的入口二进制
+node-agent/node-agent
+control-plane/control-plane
+gateway/gateway
+# 助手/agent 工作目录（轮次记录与测试日志，不属于项目源码）
+.workbuddy-ai/

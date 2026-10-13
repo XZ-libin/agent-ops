@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+import "google/protobuf/timestamp.proto";
+
+// 节点身份与健康契约（第二十一轮 N1）。
+//
+// 边界（本轮**只做注册与心跳**）：
+//   - 服务只暴露 Enroll 与 Heartbeat 两个 RPC；
+//   - **不定义任何命令/执行类 RPC**：任何未定义的方法由 gRPC 运行时自然返回
+//     UNIMPLEMENTED（fail-closed，不存在"忘记拒绝"的路径）；
+//   - 心跳采用**单向上报（unary）**而非双向流，理由见 ADR-020 §3：
+//     本轮服务端没有任何下行消息，双向流只会引入长连接状态机与背压复杂度；
+//     unary 天然幂等、便于重试与离线判定，10 秒一次的低频上报完全够用
+//     （连接复用由 HTTP/2 承担）。
+//
+// 敏感信息约束（硬性约束 7）：本契约中**没有**任何私钥字段；
+// 注册令牌只以明文形式在 EnrollRequest 中出现一次，服务端只保存其 SHA-256 哈希。
+
+// NodeStatus 节点在线状态（由控制面判定并落库）。
+enum NodeStatus {
+  NODE_STATUS_UNSPECIFIED = 0;
+  // NODE_STATUS_ONLINE 心跳正常（或刚从 offline 恢复）。
+  NODE_STATUS_ONLINE = 1;
+  // NODE_STATUS_OFFLINE 连续 3 个心跳周期（30 秒）未收到心跳。
+  NODE_STATUS_OFFLINE = 2;
+  // NODE_STATUS_REVOKED 证书已被吊销（D3）。**不可恢复**为 online——
+  // 节点必须重新注册并获得**新的 node_id**。
+  NODE_STATUS_REVOKED = 3;
+}
+
+// NodeLoadSummary 心跳携带的**负载摘要**（刻意不含进程列表、不含任何凭据）。
+message NodeLoadSummary {
+  // cpu_cores CPU 核数。
+  int32 cpu_cores = 1;
+  // memory_total_bytes 内存总量（字节）。
+  int64 memory_total_bytes = 2;
+}
+
+// EnrollRequest 节点注册请求。
+message EnrollRequest {
+  // enrollment_token 一次性注册令牌（明文仅在此处出现一次）。
+  string enrollment_token = 1;
+  // csr_der PKCS#10 证书签名请求（DER 编码），**仅用于证明私钥持有**
+  // （proof of possession）。D2：CSR **不得携带 CN、任何 SAN 或扩展字段**，
+  // 否则拒绝（对外统一 INVALID_ARGUMENT，不说明具体字段）。私钥始终留在节点侧。
+  bytes csr_der = 2;
+  // display_label 节点的**展示标签**（D2：由 declared_node_id 降级而来）。
+  // 仅用于运维界面/日志的可读性，**不参与身份与任何校验**：
+  // 权威身份 node_id 只由控制面在 Enroll 成功时分配（见 EnrollResponse.node_id）。
+  // 修改该字段不影响 node_id，也不影响签发证书的内容。
+  string display_label = 3;
+  // agent_version 节点代理版本（用于运维核对）。
+  string agent_version = 4;
+}
+
+// EnrollResponse 注册结果。
+message EnrollResponse {
+  // node_id 控制面分配的权威身份，格式 nod_<ULID>（26 字符 Crockford Base32）。
+  // D2：这是**唯一**的身份来源——节点不能自报身份。
+  string node_id = 1;
+  // certificate_der 签发的节点证书（DER）；CN 与 SAN 均为 node_id。
+  bytes certificate_der = 2;
+  // ca_certificate_der 签发该证书的 CA 证书（DER），供节点校验服务端。
+  bytes ca_certificate_der = 3;
+  // not_after 证书到期时间（30 天）。
+  google.protobuf.Timestamp not_after = 4;
+  // heartbeat_interval_seconds 控制面要求的心跳间隔（本轮固定 10 秒）。
+  int32 heartbeat_interval_seconds = 5;
+}
+
+// HeartbeatRequest 单向上报的心跳。
+message HeartbeatRequest {
+  // node_id 控制面在注册时分配的权威身份。
+  string node_id = 1;
+  // sent_at 节点侧发送时刻（控制面据此检测时间回退）。
+  google.protobuf.Timestamp sent_at = 2;
+  // agent_version 节点代理版本。
+  string agent_version = 3;
+  // load 负载摘要（CPU 核数、内存总量）。
+  NodeLoadSummary load = 4;
+  // boot_session_id 节点**进程启动**时生成的 ULID（D6）。
+  //
+  // 防重放基线按 (node_id, boot_session_id) 维护：
+  //   - **新会话**的首个心跳不与旧会话基线比较（节点重启/时钟回拨后不会永久失联）；
+  //   - **同一会话内** sent_at 必须严格递增（小于 = replay，等于 = duplicate）。
+  string boot_session_id = 5;
+}
+
+// RenewRequest 证书续期请求（走 mTLS）。
+//
+// **只包含新 CSR**：node_id 取自 mTLS 客户端证书（不信任任何自报身份），
+// 与 D2 的"身份只由控制面分配/从证书读取"保持一致。
+message RenewRequest {
+  // csr_pem 新证书的 PKCS#10 CSR（**PEM 编码**，与 Enroll 的 DER 不同——
+  // 续期是运维可见的显式操作，PEM 便于人工核对）。
+  // 与 Enroll 相同：CSR 仅用于证明私钥持有，不得含 CN / SAN / 扩展字段。
+  bytes csr_pem = 1;
+}
+
+// RenewResponse 续期结果。
+message RenewResponse {
+  // certificate_der 新签发的节点证书（DER）；CN 与 SAN 仍为**同一个** node_id。
+  bytes certificate_der = 1;
+  // ca_certificate_der 签发该证书的 CA 证书（DER）。
+  bytes ca_certificate_der = 2;
+  // not_after 新证书到期时间。
+  google.protobuf.Timestamp not_after = 3;
+  // superseded_serial 被本证书取代的旧序列号（服务端在收到新序列号的首次心跳后
+  // 才写入吊销表，reason=superseded）。仅用于运维观测，**不改变节点状态**。
+  string superseded_serial = 4;
+}
+
+// HeartbeatResponse 心跳回执。
+message HeartbeatResponse {
+  // status 控制面记录的该节点当前状态。
+  NodeStatus status = 1;
+  // server_time 控制面处理时刻（供节点做时钟偏差观测）。
+  google.protobuf.Timestamp server_time = 2;
+}
+
+// NodeAgent 节点 ↔ 控制面的注册、心跳与续期服务。
+//
+// 本轮**只有**这三个 RPC；命令通道留到后续轮次，届时以新增 service 的方式引入，
+// 不改动本 service 的语义。
+service NodeAgent {
+  // Enroll 用一次性注册令牌换取节点证书与权威身份。
+  rpc Enroll(EnrollRequest) returns (EnrollResponse);
+  // Heartbeat 单向上报心跳（10 秒一次）。
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  // Renew 用新 CSR 续期证书（**必须走 mTLS**：node_id 取自客户端证书）。
+  rpc Renew(RenewRequest) returns (RenewResponse);
+}

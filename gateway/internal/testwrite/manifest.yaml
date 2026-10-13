@@ -1,0 +1,20 @@
+# 仅测试目录的写能力清单（第九轮约束 5/6）。
+# test_only: true —— 生产注册表拒绝加载，生产目录不存在任何写能力。
+# 操作对象：sshd 测试容器内 /tmp/agent-ops-test/ 下的标记文件（固定前缀）。
+name: testwrite
+access_methods: [ssh]
+capabilities:
+  - name: test.write.marker
+    risk_tier: low
+    destructive: false            # 写的是可逆测试标记文件（删除即恢复），非删除语义
+    rollbackable: true            # 对应 PlanRollback：删除该标记文件
+    idempotent: true
+    test_only: true
+    timeout: 60s
+  - name: test.write.marker.delete
+    risk_tier: low
+    destructive: false            # 仅删除测试标记文件，可用写操作恢复
+    rollbackable: true            # 对应 PlanRollback：重新写入该标记文件
+    idempotent: true
+    test_only: true
+    timeout: 60s

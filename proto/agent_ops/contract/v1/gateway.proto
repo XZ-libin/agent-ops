@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+import "agent_ops/contract/v1/capability.proto";
+import "agent_ops/contract/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+// 控制层 ↔ 执行网关 gRPC。
+// 本文件含健康检查与资产查询两个占位接口（ADR-002），以及第十轮接入的
+// 执行网关对外入口（SubmitExecute / Approve / Reject / ExecuteApproved /
+// GetApproval）。
+//
+// 身份（actor）一律由 gRPC metadata 承载（认证后写入），不接受请求体自报：
+// 本轮为仅测试的静态 token 认证（见 gateway/internal/grpcwire）。
+// 写操作、指令与回执通道将按 ADR-002 以双向流定义，随后续批次补充。
+// 工程默认值（默认值，待运维确认）：节点 Agent 心跳周期 30s、
+// 连续 3 次未心跳判离线、指令签名 Ed25519；
+// 双向流消息形状随执行通道批次定义（OPEN_QUESTIONS Q4）。
+service Gateway {
+  // 健康检查占位：与对外 REST 的 /healthz 对应。
+  rpc Health(HealthRequest) returns (HealthResponse);
+  // 资产查询占位。
+  rpc QueryAssets(QueryAssetsRequest) returns (QueryAssetsResponse);
+  // 提交执行：策略 → 幂等 → 执行 → 审计；需审批时只创建 pending 审批记录。
+  rpc SubmitExecute(SubmitExecuteRequest) returns (SubmitExecuteResponse);
+  // 审批通过（四眼原则：审批人必须不同于请求人；审批人取自认证身份）。
+  rpc Approve(ApproveRequest) returns (ApproveResponse);
+  // 审批拒绝。
+  rpc Reject(RejectRequest) returns (RejectResponse);
+  // 审批通过后的受控执行（先占后执行：抢占审批 → 执行 → 消费审批）。
+  rpc ExecuteApproved(ExecuteApprovedRequest) returns (ExecuteApprovedResponse);
+  // 查询审批记录。
+  rpc GetApproval(GetApprovalRequest) returns (GetApprovalResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  // TODO(待决策)：存活/就绪拆分及返回字段集待定。
+  string status = 1;  // 占位恒为 "ok"（工程默认值，待运维确认）
+}
+
+message QueryAssetsRequest {
+  Environment environment = 1;  // 可选过滤：prod / staging / test 固定枚举
+  string filter = 2;            // 占位过滤条件
+}
+
+// 资产摘要占位结构。
+// 字段集为工程默认（id/asset_type/environment/status，默认值，待运维确认，Q16）；
+// 完整字段集（负责人、接入方式等）待资产清单模块扩展。
+message AssetSummary {
+  string id = 1;          // 带前缀的 ULID，如 ast_01H…
+  string asset_type = 2;  // host / cluster / docker / component
+  Environment environment = 3;
+  string status = 4;      // 工程默认取值 healthy/degraded/unhealthy（默认值，待运维确认）
+}
+
+message QueryAssetsResponse {
+  repeated AssetSummary assets = 1;
+}
+
+// —— 第十轮：执行网关对外入口 ——
+
+// 审批记录（网关审批存储的只读投影）。
+message ApprovalRecord {
+  string id = 1;
+  string actor = 2;                        // 请求人（发起者）
+  string capability = 3;
+  string status = 4;                       // pending / approved / rejected / expired / executing / consumed / abandoned
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expires_at = 6;   // pending 过期时间
+  google.protobuf.Timestamp approved_at = 7;  // 未批准时不设置
+  string decided_by = 8;                      // 审批人 / system
+  string reason = 9;                          // 审批意见 / 过期作废原因
+}
+
+// 执行结局（提交执行与审批后执行共用）。
+// status 取值固定：success / failed / pending / denied / conflict / in_progress。
+message ExecuteOutcome {
+  string status = 1;
+  string decision = 2;              // allow / require_approval / deny（审计标签，见 ADR-008）
+  repeated string reasons = 3;      // 判定理由（不含凭据）
+  string approval_id = 4;           // require_approval 分支创建的审批记录 ID
+  ActionResult result = 5;          // 执行结果（success / 幂等重放时有效）
+  string message = 6;               // 人读说明（错误信息经脱敏）
+  bool replayed = 7;                // 本次响应来自幂等重放（未真正执行）
+}
+
+message SubmitExecuteRequest {
+  Action action = 1;             // 执行动作（capability/params/target/impact_scope/expected）
+  Environment environment = 2;   // 目标环境
+  string idempotency_key = 3;    // 调用方携带的幂等键（必填）
+  bool freeze_window = 4;        // 是否处于变更冻结窗口（由调用方判断传入）
+}
+
+message SubmitExecuteResponse {
+  ExecuteOutcome outcome = 1;
+}
+
+message ApproveRequest {
+  string approval_id = 1;
+  string reason = 2;  // 审批意见
+}
+
+message ApproveResponse {
+  ApprovalRecord approval = 1;
+}
+
+message RejectRequest {
+  string approval_id = 1;
+  string reason = 2;
+}
+
+message RejectResponse {
+  ApprovalRecord approval = 1;
+}
+
+message ExecuteApprovedRequest {
+  string approval_id = 1;          // 已批准的审批记录 ID
+  Action action = 2;               // 必须与审批记录绑定的请求内容一致
+  Environment environment = 3;
+  string idempotency_key = 4;      // 必填；抢占后不可复用
+  bool freeze_window = 5;
+}
+
+message ExecuteApprovedResponse {
+  ExecuteOutcome outcome = 1;
+}
+
+message GetApprovalRequest {
+  string approval_id = 1;
+}
+
+message GetApprovalResponse {
+  ApprovalRecord approval = 1;
+}

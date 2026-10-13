@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+// 环境的固定枚举（决策：不允许自由输入）。
+// JSON 编码按 proto3 规范使用值名（如 "ENVIRONMENT_PROD"）；
+// REST 侧的领域词汇 prod/staging/test 由 proto 生成的 OpenAPI 承载（ADR-002）。
+enum Environment {
+  ENVIRONMENT_UNSPECIFIED = 0;
+  ENVIRONMENT_PROD = 1;
+  ENVIRONMENT_STAGING = 2;
+  ENVIRONMENT_TEST = 3;
+}
+
+// 操作主体：人或 Agent，用于审批与审计记录。
+message Actor {
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_HUMAN = 1;
+    KIND_AGENT = 2;
+  }
+  Kind kind = 1;
+  string id = 2;
+}
+
+message KV {
+  string key = 1;
+  string value = 2;
+}
+
+// 凭据引用句柄：网关执行时经密钥服务临时获取（SSH 直连用 CA 签发的短期证书），
+// 不落盘、不写日志。契约中不承载任何真实凭据或连接字符串。
+message CredentialRef {
+  string id = 1;
+}

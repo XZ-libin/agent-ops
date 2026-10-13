@@ -1,0 +1,25 @@
+# 本地测试用 PostgreSQL（占位配置，仅本地开发环境，非真实凭据）。
+# 用法：
+#   docker compose -f deploy/docker-compose.yaml up -d
+# 连接串默认（代码占位值；宿主端口用 55432，避免与本机其他项目的 5432 冲突）：
+#   postgres://agent_ops:agent_ops@localhost:55432/agent_ops?sslmode=disable
+# 测试可用环境变量 AGENT_OPS_TEST_DATABASE_URL 覆盖。
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: agent_ops
+      POSTGRES_PASSWORD: agent_ops
+      POSTGRES_DB: agent_ops
+    ports:
+      - "55432:5432"
+    volumes:
+      - agent_ops_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent_ops -d agent_ops"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  agent_ops_pgdata:

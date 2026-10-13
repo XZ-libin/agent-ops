@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+import "agent_ops/contract/v1/common.proto";
+import "agent_ops/contract/v1/risk.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+// 接入方式：对应开发文档「执行网关与节点 Agent」的四种通道。
+enum AccessKind {
+  ACCESS_UNSPECIFIED = 0;
+  ACCESS_SSH = 1;         // SSH 直连，使用 CA 签发的短期证书（经堡垒机）
+  ACCESS_KUBECONFIG = 2;  // Kubernetes API Server，服务账号按集群与命名空间收敛
+  ACCESS_DOCKER = 3;      // TLS 保护的 Docker API，仅开放必要操作
+  ACCESS_AGENT = 4;       // 节点 Agent：mTLS 长连接，指令由控制层签名
+}
+
+// 能力：适配器在清单中声明的一个操作。
+// TODO(待决策)：能力超时默认值（候选：只读 60s、执行类 300s）待业务确认，
+// 本消息只承载契约；超时后必须能够安全终止（契约测试项）。
+message Capability {
+  string name = 1;                       // 形如 "diagnose.slow_query"、"restart.service"
+  RiskTier risk_tier = 2;                // 基础等级；契约测试校验与实际行为一致
+  bool idempotent = 3;                   // 是否幂等
+  bool rollbackable = 4;                 // 不可回滚时必须在清单中显式声明
+  google.protobuf.Duration timeout = 5;  // 超时时间
+  repeated string permissions = 6;       // 所需权限
+  bool destructive = 7;                  // 不可逆或删除语义；策略引擎硬拒绝（ADR-007 修订 1）
+  bool test_only = 8;                    // 仅测试目录声明（第九轮）：生产目录不得包含；
+                                         // 网关注册表默认拒绝 test_only=true 的声明，
+                                         // 仅测试配置可加载且生产配置下不可见
+}
+
+// 适配器清单：声明式 YAML 加载后转换为此结构。
+// TODO(待决策)：首批数据库种类未定，相应适配器清单随确认后补充。
+message Manifest {
+  string name = 1;                       // 组件名
+  repeated string supported_versions = 2; // 支持的版本范围
+  repeated AccessKind access_methods = 3; // 接入方式
+  repeated Capability capabilities = 4;   // 能力列表
+}
+
+// 组件实例：Discover 在目标上发现的实例与版本。
+message Instance {
+  string id = 1;
+  string version = 2;
+  string asset_id = 3;
+  repeated KV extra = 4;  // 端口、命名空间等组件专属信息
+}
+
+message Metric {
+  string name = 1;
+  double value = 2;
+}
+
+// 健康报告：Health 必须只读。
+// status 工程默认取值 healthy/degraded/unhealthy（默认值，待运维确认，OPEN_QUESTIONS Q16）。
+message HealthReport {
+  string status = 1;
+  repeated Metric metrics = 2;
+  google.protobuf.Timestamp collected_at = 3;
+}
+
+// 诊断证据与结论：Diagnose 必须只读。
+message Finding {
+  string hypothesis = 1;
+  repeated string evidence_refs = 2;  // 结论必须附证据引用
+  string verdict = 3;
+}
+
+message DiagnosisReport {
+  repeated Finding findings = 1;
+  string conclusion = 2;
+  string confidence = 3;  // 低可信度结论不触发自动执行
+}
+
+// 目标资产及其接入方式。
+message AssetTarget {
+  string asset_id = 1;                // 带前缀的 ULID，如 ast_01H…
+  AccessKind access = 2;
+  CredentialRef credential = 3;       // 引用句柄，执行时才解析
+  google.protobuf.Struct params = 4;  // 目标级参数（如 endpoint），不含凭据
+}
+
+// 风险策略签发的放行凭证。适配器只接受带此凭证的 Execute，
+// 不自行判断风险，不采信 Agent 对自身风险的描述。
+message AuthZ {
+  string authorization_id = 1;
+}
+
+// 执行动作：变更方案与回滚计划共用。
+// PlanRollback 返回的每个动作都是已声明的能力，
+// 须经风险策略判定后由 Execute 执行，回滚不得绕过风险判定。
+message Action {
+  string capability = 1;               // 已声明能力名
+  google.protobuf.Struct params = 2;
+  AssetTarget target = 3;
+  string impact_scope = 4;             // 影响范围说明
+  string expected = 5;                 // 预期结果
+}
+
+message OutputChunk {
+  string stream = 1;   // stdout / stderr / 交互输入等
+  string content = 2;
+}
+
+// Execute 的返回。所有写操作与交互式会话记录完整输入输出，供录像引用。
+message ActionResult {
+  bool success = 1;
+  repeated OutputChunk outputs = 2;
+  string record_id = 3;  // 执行记录引用
+}
+
+// 执行记录：PlanRollback 的输入。
+message ActionRecord {
+  Action action = 1;
+  AssetTarget target = 2;
+  string output_ref = 3;
+  google.protobuf.Timestamp started_at = 4;
+  google.protobuf.Timestamp ended_at = 5;
+}

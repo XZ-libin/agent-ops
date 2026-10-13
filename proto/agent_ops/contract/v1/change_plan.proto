@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+import "agent_ops/contract/v1/capability.proto";
+import "agent_ops/contract/v1/common.proto";
+import "agent_ops/contract/v1/risk.proto";
+import "google/protobuf/timestamp.proto";
+
+enum ChangePlanStatus {
+  CHANGE_PLAN_STATUS_UNSPECIFIED = 0;
+  CHANGE_PLAN_STATUS_DRAFT = 1;
+  CHANGE_PLAN_STATUS_PENDING_APPROVAL = 2;
+  CHANGE_PLAN_STATUS_APPROVED = 3;
+  CHANGE_PLAN_STATUS_DENIED = 4;
+  CHANGE_PLAN_STATUS_EXECUTING = 5;
+  CHANGE_PLAN_STATUS_SUCCEEDED = 6;
+  CHANGE_PLAN_STATUS_FAILED = 7;
+  // 审批超时自动关闭与人工取消均落此态，关闭原因写入审计。
+  CHANGE_PLAN_STATUS_ROLLED_BACK = 8;
+  CHANGE_PLAN_STATUS_CANCELLED = 9;
+}
+
+message Approval {
+  string id = 1;
+  string approver = 2;  // 审批人与执行人不能是同一人
+  enum Result {
+    RESULT_UNSPECIFIED = 0;
+    RESULT_APPROVED = 1;
+    RESULT_DENIED = 2;
+  }
+  Result decision = 3;
+  string reason = 4;  // 审批必须填写理由
+  google.protobuf.Timestamp decided_at = 5;
+}
+
+message Execution {
+  string id = 1;
+  string status = 2;
+  google.protobuf.Timestamp started_at = 3;
+  google.protobuf.Timestamp ended_at = 4;
+  string output_ref = 5;
+}
+
+// 变更方案：Agent 或人工提出的一组操作，附影响范围与回滚步骤。
+// TODO(待决策)：审批超时默认值未定（候选 30 分钟、生产高风险 2 小时），
+// 方案生命周期的超时字段随变更模块实现批次补充。
+message ChangePlan {
+  string id = 1;
+  Actor created_by = 2;                // 人或 Agent
+  AssetTarget target = 3;
+  repeated Action actions = 4;
+  RiskTier risk_tier = 5;              // 策略计算后的最终等级
+  Decision decision = 6;               // 策略独立判定的决策
+  repeated Action rollback_steps = 7;  // Agent 提出，PlanRollback 校验/补全
+  ChangePlanStatus status = 8;
+  google.protobuf.Timestamp created_at = 9;
+  repeated Approval approvals = 10;
+  repeated Execution executions = 11;
+}

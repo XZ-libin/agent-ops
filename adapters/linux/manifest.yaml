@@ -1,0 +1,27 @@
+# Linux 主机只读适配器清单（声明式）。
+# 能力名称须通过名称校验（^[a-z0-9_]+(\.[a-z0-9_]+)*$，见 ADR-007 修订 2）。
+# 本适配器只有只读能力，不声明任何写操作。
+name: linux
+supported_versions: [any]
+access_methods: [ssh, agent]
+capabilities:
+  - name: diagnose.disk_usage
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 60s
+  - name: diagnose.memory_pressure
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 60s
+  - name: diagnose.load_average
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 60s
+  - name: diagnose.service_state
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 60s

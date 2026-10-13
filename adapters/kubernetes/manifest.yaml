@@ -1,0 +1,34 @@
+# Kubernetes 只读适配器清单（声明式，第十三轮 K1）。
+# 能力名称须通过名称校验（^[a-z0-9_]+(\.[a-z0-9_]+)*$）。
+# 本适配器只有只读能力：全部 read_only、rollbackable=false、destructive=false；
+# 永不读取 Secret（secrets 路径在客户端内部直接拒绝）。
+# timeout 与客户端默认单请求超时（10s）对齐。
+name: kubernetes
+supported_versions: [any]
+access_methods: [kubernetes]
+capabilities:
+  - name: k8s.version
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: k8s.namespace.get
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: k8s.pod.list
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: k8s.pod.status
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: k8s.deployment.list
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s

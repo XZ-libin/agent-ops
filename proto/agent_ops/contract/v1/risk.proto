@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package agent_ops.contract.v1;
+
+option go_package = "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1;contractv1";
+
+// 风险等级：能力在清单中声明的基础等级（四档，ADR-006）。
+// 上下文因素（生产环境、影响范围、可逆性、冻结窗口）只升级等级，不直接改决策。
+// JSON 编码按 proto3 规范使用值名（如 "RISK_TIER_MEDIUM"）；
+// REST 侧的领域词汇 read_only/low/medium/high 由 proto 生成的 OpenAPI 承载。
+enum RiskTier {
+  RISK_TIER_UNSPECIFIED = 0;
+  RISK_TIER_READ_ONLY = 1;
+  RISK_TIER_LOW = 2;
+  RISK_TIER_MEDIUM = 3;
+  RISK_TIER_HIGH = 4;
+}
+
+// 策略决策：等级到决策的映射写在策略配置里（auto/require_approval/deny）。
+enum Decision {
+  DECISION_UNSPECIFIED = 0;
+  DECISION_AUTO = 1;
+  DECISION_REQUIRE_APPROVAL = 2;
+  DECISION_DENY = 3;
+}

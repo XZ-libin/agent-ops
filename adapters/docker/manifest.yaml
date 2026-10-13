@@ -1,0 +1,34 @@
+# Docker 主机只读适配器清单（声明式，第十二轮 D1）。
+# 能力名称须通过名称校验（^[a-z0-9_]+(\.[a-z0-9_]+)*$，见 ADR-007 修订 2）。
+# 本适配器只有只读能力：全部 read_only、rollbackable=false、destructive=false；
+# 不声明任何写能力（写操作在 Docker 适配器中被客户端白名单直接拒绝）。
+# timeout 与客户端默认单请求超时（10s）对齐。
+name: docker
+supported_versions: [any]
+access_methods: [docker]
+capabilities:
+  - name: docker.version
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: docker.info
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: docker.container.list
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: docker.container.inspect_status
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s
+  - name: docker.image.list
+    risk_tier: read_only
+    destructive: false
+    idempotent: true
+    timeout: 10s

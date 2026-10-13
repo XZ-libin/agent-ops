@@ -1,0 +1,32 @@
+# 测试专用 compose：在 docker-compose.yaml（本地测试数据库）之上叠加 alerts 服务。
+#
+# 用法（仅本地测试；不用于生产）：
+#   docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.alerts.yaml config
+#   docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.alerts.yaml up -d
+#
+# 安全说明（第十五轮 R6）：
+#   - 本文件中的密钥是**明显的测试假值**（test-only-key-*），仅用于本地测试，
+#     不得用于任何真实环境；生产密钥由运维通过环境变量注入，绝不写入仓库；
+#   - 服务只绑定 127.0.0.1（不暴露到宿主机以外的网络）；
+#   - 依赖本地测试数据库服务（postgres），DSN 指向 agent_ops_test（库名由进程启动校验强制）。
+services:
+  alerts:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.alerts
+    # 仅绑定回环地址，不对外暴露。
+    ports:
+      - "127.0.0.1:8088:8088"
+    environment:
+      # 仅测试：明显的假密钥（非真实凭据）。
+      AGENT_OPS_ALERT_SOURCES: "test-source-a,test-source-b"
+      AGENT_OPS_ALERT_KEY_TEST_SOURCE_A: "test-only-key-source-a"
+      AGENT_OPS_ALERT_KEY_TEST_SOURCE_B: "test-only-key-source-b"
+      # 仅测试：本地测试数据库（55432），库名必须是 agent_ops_test。
+      AGENT_OPS_ALERT_DSN: "postgres://agent_ops:agent_ops@postgres:5432/agent_ops_test?sslmode=disable"
+    command: ["-mode", "test", "-addr", "0.0.0.0:8088"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # 仅测试：不在生产 compose 中启用（本文件不参与生产部署）。
+    profiles: ["test"]

@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "alg": "RS256",
+      "e": "AQAB",
+      "kid": "aud-arr-1",
+      "kty": "RSA",
+      "n": "80fwbGf8Dwuli4QG9yQE7Z_S8AIebB9NG0R9BzJ0w2F_2Rhg0SErvm6zH9dbjwxwdxHQQJutAf-5lL-oTt8LP0ju-w70OQcCgIk54NVvBsExUp7B0u3-54fq271h3LdQTvLHob6TLiGVvhDvU1HJzF-PpAWSLXSUt5cMzcKLYDy10aP-_XGmFLGvx73D2juHJ0vHZXOnVXOoHa5UMTZgalBeg8ggttr_fWMvQayvdqvZal97WhmtgiIcPVb8OGtWtSpSLzShUsMjrpig3sKb9zmZlv0IEeL62Ck9EqV_1SjOn2RBJZHEt3KDlee_eyYjvdtdrECXmHwdgMraYGuEyQ",
+      "use": "sig"
+    }
+  ]
+}
