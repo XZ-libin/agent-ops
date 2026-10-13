@@ -1,14 +1,34 @@
 # 首次 CI 运行：预期、已观察到的结果与需回收的内容
 
-> **第二十四轮：本地闭环；CI 未验证。**
-> 本文档写于第二十五轮（T4 CI 预演）。第二十五轮的**代码**改动（T2 工具版本钉定、
-> T3 保留开关、T2c 守卫）**尚未提交，不被任何 CI 记录覆盖**；
-> 唯一例外是 T1 的 `docs/tooling.md` 修正被会话外的提交 `03130ec` 一并提交推送，
-> 因而被 run 2 覆盖（该 run 的 test job 里 `TestCI2/TestCI3` 解析的正是修正后的登记表）。
+> **第二十四轮 / 第二十五轮：本地闭环；CI 已由 run 1–3 验证（2026-10-13，全部 success）。**
+> 说明：本行在第二十五轮 T5 时原写为"CI 未验证"——那是推送前的状态。
+> 提交 `626ab5b`（含 T2/T3 代码）推送后 run 3 三 job 全绿，步骤级日志已回收，
+> 故按事实更新；证据见 §1A。**在此之前不得声称 CI 通过。**
 
 ---
 
-## 1. 已在 GitHub 公开 API 观察到的运行记录（无凭据读取）
+## 1A. run 3 = 提交 `626ab5b`（第二十五轮 T2/T3 改动第一次进 CI）
+
+| 项 | 结果 |
+| --- | --- |
+| run | 3，`completed / success`，2026-10-13 13:50:11Z → 13:53:15Z（约 3 分钟） |
+| job | `gen-check` success、`build` success、`test` success |
+| 步骤 6 安装并校验 kubectl | `/tmp/kubectl: OK`（`echo "$expected  /tmp/kubectl" \| sha256sum -c -` 通过） |
+| 步骤 8 单元与集成测试 | **顶层 459 PASS / 0 FAIL / 1 SKIP，37 个有测试的包，19 个无测试文件** —— 与本地 `round25-test-output.log` **逐项相同** |
+| 步骤 8 中的 T2 闸门 | `[T2] kubectl 已钉到登记版本 v1.31.4（/usr/local/bin/kubectl）` 出现 **4 次** |
+| 步骤 9 残留门禁原文 | `residual_test.go:97: [残留检查] kind 集群 0、agent-ops.test=true 容器 0、test_run_* schema 0`<br>`--- PASS: TestNoLeftoversAfterSuite (0.05s)`<br>`residual-check: OK (no leftovers)` |
+| 唯一 SKIP | `TestNoLeftoversAfterSuite`（步骤 8 阶段，未设 `AGENT_OPS_RESIDUAL_CHECK=1`，设计如此；它在步骤 9 被真实执行并 PASS） |
+| annotation（唯一一条） | `The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026.` —— 迁移提醒，非失败 |
+
+**结论：残留门禁那一行是 PASS，不是 SKIP。** 取到方式：公开 API 的
+`/actions/runs/38408229682/logs`（302 → zip）需要鉴权，用本机 PAT 读取；
+日志条目名含中文，`unzip` 会因文件名编码失败，需用 Python 的 `zipfile` 读取。
+CI 上 `.tools/kubectl` 不存在（已 gitignore），`internal/toolpin` 因此走 PATH 上
+由 `ci.yml` 下载并校验过的 v1.31.4 —— 与本地设计一致，本轮已在真机上验证成立。
+
+## 1B. 此前两次运行（第 24 轮工作树）
+
+已在 GitHub 公开 API 观察到的运行记录（无凭据读取）
 
 仓库 `XZ-libin/agent-ops`（**public**，默认分支 `main`）有两个 workflow run：
 
@@ -37,14 +57,14 @@ run 2 的三个 check run（对应 `ci.yml` 的三个 job）全部 `completed / 
 | 8 | 单元与集成测试（`make test-verbose`） | success | **143s** |
 | 9 | **残留门禁（`make residual-check`）** | success | **<1s** |
 
-**两点必须说清楚的保留意见：**
+**保留意见（已由 run 3 消解）：**
 
-1. 这两个 run 覆盖的是**第 24 轮工作树**，不是本轮改动。本轮结论仍是"CI 未验证"。
-2. 步骤 9 的**日志正文**需要鉴权才能取（`/logs` 端点），本轮不使用任何 GitHub 凭据，
-   因此**没有拿到 `residual-check: OK (no leftovers)` 那一行原文**。
-   能证明的只有：该步骤 `conclusion=success`，且 `Makefile` 的 `residual-check` 目标在
-   用例被 SKIP 时会以非零码退出（"SKIP 不计入通过"），所以 success 蕴含"门禁真实执行且未发现残留"；
-   但这是**推理**，不是原文。请人工把日志里那一行贴回来确认（见 §4）。
+1. run 1/run 2 覆盖的是**第 24 轮工作树**（其中 `03130ec` 顺带把 T1 的 `tooling.md` 修正扫入提交）。
+   本轮 T2/T3 代码在提交 `626ab5b` 推送后由 **run 3** 覆盖，结果见 §1A——三个 job 全绿，
+   步骤 8 的用例统计与本地逐项一致。
+2. `residual-check: OK (no leftovers)` 那一行**原文已回收**（用本机 PAT 读
+   `/actions/runs/<id>/logs`，302 → zip；条目名含中文，须用 Python `zipfile` 而非 `unzip`）。
+   在此之前它只是"步骤 conclusion=success + Makefile 把 SKIP 判为失败"的推理。
 
 ## 2. 每个 job 的预期步骤与预期结果（下一次推送时）
 
@@ -71,14 +91,18 @@ run 2 的三个 check run（对应 `ci.yml` 的三个 job）全部 `completed / 
 | 环境纯净度 | 全新 runner，无本地 env | 我使用 `env -i` + 最小 PATH 模拟 | 见 §5 预演结果 |
 | Action 运行时 | checkout v7.0.1 / setup-go v7.0.0（node24） | 不适用 | 由会话外在 run 1 之后升级（原因：run 1 提示 Node.js 20 弃用）；两个钉值已用官方 API 核验 tag→commit 一致 |
 
-## 4. 首跑后需要人工粘回的内容
+## 4. 首跑后需要人工粘回的内容（run 3 已全部取得，留作复核口径）
 
-1. 三个 job 的名字与状态（`gen-check` / `build` / `test`）；
+1. 三个 job 的名字与状态：`gen-check` / `build` / `test` —— 已取，均 success；
 2. `test` job 日志中这两行的**原文**：
-   - `make test-verbose` 的汇总（各模块 `ok`/`FAIL`，或 `PASS` 总数）；
-   - 残留门禁那一行：应为 `residual-check: OK (no leftovers)`，
-     若出现 `residual-check: FAILED ...` 或 `residual-check: FAILED (gate test was SKIPPED - equals no check)` 则视为失败；
-3. `安装并校验 kubectl` 步骤中 `sha256sum -c` 的输出行（应为 `/tmp/kubectl: OK`）。
+   - `make test-verbose` 汇总：已取，**顶层 459 PASS / 0 FAIL / 1 SKIP，37 个有测试的包**；
+   - 残留门禁：已取，`residual-check: OK (no leftovers)` +
+     `--- PASS: TestNoLeftoversAfterSuite (0.05s)`（若出现 `residual-check: FAILED`
+     或 `FAILED (gate test was SKIPPED - equals no check)` 则为失败）；
+3. `安装并校验 kubectl` 步骤的 `sha256sum -c` 输出：已取，`/tmp/kubectl: OK`。
+
+后续每次推送仍按同一口径回收这四项；`/logs` 端点需鉴权（本机 PAT 可用），
+公开 API 只能拿到 job/step 的 `status` 与 `conclusion`。
 
 ## 5. 本地预演（T4a）结果
 

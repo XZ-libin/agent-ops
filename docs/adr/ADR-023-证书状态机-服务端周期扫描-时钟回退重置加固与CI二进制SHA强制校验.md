@@ -5,10 +5,12 @@
 - 轮次：第二十四轮（闭环轮：只修已知缺口，不新增功能）
 - 关系：**不修改 ADR-001 ~ ADR-022 的正文**；ADR-022 末尾追加一行指向本 ADR。
 
-> **第二十四轮：本地闭环；CI 未验证。**
-> CI 首次运行结果尚未提供；本 ADR 全部结论均来自本地 `go test` / `make` 证据，
-> **不得**表述为"已通过 CI"。第二十五轮（T1 登记值修正、T2 工具版本钉定、
-> T3 本地保留开关）在同一约束下补充，状态行同样为"CI 未验证"。
+> **第二十四轮：本地闭环；CI 已由 run 1–3 验证（2026-10-13 全部 success）。**
+> 本行在第二十四/二十五轮期间写作"CI 未验证"——那是**推送之前**的状态，当时不得声称通过。
+> 提交 `8e5f45d`/`03130ec`/`626ab5b` 推送后，GitHub Actions 三次运行
+> `gen-check / build / test` 均 `completed/success`，且残留门禁步骤原文为
+> `residual-check: OK (no leftovers)`（`--- PASS: TestNoLeftoversAfterSuite`，**不是 SKIP**）。
+> 逐步骤证据见 `docs/ops/first-ci-run.md` §1A。
 
 ---
 

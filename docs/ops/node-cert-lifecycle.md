@@ -1,8 +1,8 @@
 # 节点证书生命周期运维手册
 
-> **第二十四轮：本地闭环；CI 未验证。**
-> 本文档与代码的一致性由测试守护（`internal/nodesvc` 的 T1–T5 用例）。
-> 首次 CI 运行的预期步骤与需回收的内容见 `docs/ops/first-ci-run.md`。
+> **第二十四轮：本地闭环；CI 已验证（run 1–3 全绿，2026-10-13）。**
+> 本文档与代码的一致性由测试守护（`internal/nodesvc` 的 T1–T5 用例）；
+> 首次 CI 运行的步骤明细与原文证据见 `docs/ops/first-ci-run.md`（残留门禁为 PASS，非 SKIP）。
 
 适用对象：Agent Ops 节点代理（`node-agent`）与其控制面（`control-plane` 的节点域）。
 
