@@ -168,13 +168,12 @@ Kubernetes Secret 任何路径、任何方式都不读取（硬性约束 4）。
 
 | # | 例外内容 | 确认方式 |
 | --- | --- | --- |
-| 1 | 入站 HTTP 白名单扩展为 `{alerts/internal/httpapi/server.go, internal/console/httpapi/}`（§1） | 用户在 C0 交付后**重发了同一轮提示词**（其中逐字列出该集合与 C4 的精确相等断言）→ 视为确认 |
+| 1 | 入站 HTTP 白名单扩展为 `{alerts/internal/httpapi/server.go, internal/console/httpapi/}`（§1） | **已显式确认**（2026-10-13 轮末："确认例外处理无误"）；此前一次为隐式（重发同一提示词） |
 | 2 | OpenAPI 本轮手写 + 两条一致性守卫，自动生成留待后续（§6） | 同上 |
 
-**确认口径说明**：这是一次"以重发指令表示同意"的确认，不是显式的"我确认"字样。
-如果这不是你的本意，回退成本很低：删除 `AllowedInboundHTTPFiles` 的第二项并同步
-`TestConsoleInboundHTTPAllowlistExact`/`TestInboundAllowlistIsExplicit` 的期望值，
-控制台代码即会因"未登记文件出现入站 HTTP 符号"被守卫拦下（该失败在实现过程中
-已被真实观测到一次）。
+回退路径（若日后需要）：删除 `AllowedInboundHTTPFiles` 的第二项并同步
+`TestConsoleInboundHTTPAllowlistExact` / `TestInboundAllowlistIsExplicit` 的期望值，
+控制台代码即会因"未登记文件出现入站 HTTP 符号"被守卫拦下——该失败在实现过程中
+已被真实观测到一次，因此回退是确定有效的，不依赖人工记忆。
 
 §4 的 50/200/10 秒/60 秒与 §5 的 256 字符仍为**工程默认，待确认**。
