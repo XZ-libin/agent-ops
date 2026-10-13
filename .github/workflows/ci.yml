@@ -18,10 +18,15 @@
 #   - 工具链版本固定（Go 1.27.2 / buf v1.47.2 / kind v0.30.0），来源与 SHA-256
 #     登记见 docs/tooling.md；
 #   - 第三方 Action **钉到 commit SHA**（第二十四轮，不跟随可变 tag）：
-#       actions/checkout@v4  -> 11d5960a326750d5838078e36cf38b85af677262
-#       actions/setup-go@v5  -> 40f1582b2485089dde7abd97c1529aa768e1baff
+#       actions/checkout@v7.0.1 -> 3d3c42e5aac5ba805825da76410c181273ba90b1
+#       actions/setup-go@v7.0.0 -> b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
 #     取值方式：`https://api.github.com/repos/actions/<repo>/commits/<tag>`（官方 API
 #     解析 tag 指向的 commit），登记于 2026-10-13；升级时须重新解析 SHA 并同步本注释。
+#     版本缘由：首轮 CI 三个 job 均提示 "Node.js 20 is deprecated"（checkout v4 /
+#     setup-go v5 的 action.yml 声明 `using: node20`，runner 已停止原生支持并强制
+#     跑在 node24 上）。checkout v7.0.1 与 setup-go v7.0.0 的 action.yml 均为
+#     `using: node24`，故升至此版本；升级同时确认 v7 的大版本 tag 与 release tag
+#     指向同一 commit（可直接钉 release SHA）。
 #
 # 未在 GitHub 上执行：本文件由本地命令序列逐条模拟验证（见报告），
 # 首次真实运行结果待补充（第二十一轮的前置条件）。
@@ -50,12 +55,16 @@ jobs:
     name: gen-check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: ${{ env.GO_VERSION }}
           # setup-go 默认按官方 go.dev 清单校验工具链校验和。
           check-latest: false
+          # v7 起该输入默认为 true，此处显式写出而非依赖默认值：缓存 Go 模块与
+          # 构建产物（首轮 test job 实测量 192s，其中大半是全新 runner 的冷编译）。
+          # 不影响门禁强度——测试仍带 -count=1 禁用结果缓存，gen-check 仍逐字节比对。
+          cache: true
       - name: 生成代码一致性检查（make gen-check）
         run: make gen-check
 
@@ -64,11 +73,12 @@ jobs:
     name: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: ${{ env.GO_VERSION }}
           check-latest: false
+          cache: true
       - name: 编译全部模块（make build）
         run: make build
 
@@ -91,11 +101,12 @@ jobs:
           --health-timeout 5s
           --health-retries 12
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: ${{ env.GO_VERSION }}
           check-latest: false
+          cache: true
       # kind：经 Go module proxy 构建（docs/tooling.md 登记项，非二进制下载）。
       - name: 安装 kind（${{ env.KIND_VERSION }}）
         run: |

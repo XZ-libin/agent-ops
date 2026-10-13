@@ -12,7 +12,7 @@
 | 名称 | 版本 | 来源 URL | SHA-256 | 用途 | 校验记录 |
 | --- | --- | --- | --- | --- | --- |
 | kind | v0.30.0 (go1.27.2 darwin/arm64) | 经 Go module proxy：`go install sigs.k8s.io/kind@v0.30.0`（模块代理 `proxy.golang.org`） | `1f9b705cd82503f3cd8176022325cb469290dfbd589785b101fc9739a8c66c8e` | Kubernetes 集成测试：创建/删除临时 kind 集群 | 第十四轮记录（构建自模块源码，非二进制下载；SHA-256 为本机产物实测值） |
-| kubectl | v1.31.4 (darwin/arm64) | `https://dl.k8s.io/release/v1.31.4/bin/darwin/arm64/kubectl` | `a756bb911298a85af35c0111c370728a26c532d504fe8b534eb684501fcaf996` | Kubernetes 集成测试夹具：创建/删除测试命名空间与 Pod | 第十四轮补录（第十三轮下载时未记录，属流程缺陷，已按裁决补录并加入本表） |
+| kubectl | v1.31.4 (darwin/arm64) | `https://dl.k8s.io/release/v1.31.4/bin/darwin/arm64/kubectl` | `a756bb911298a85af35c0111c371728a26c532d504fe8b534eb684501fcaf996` | Kubernetes 集成测试夹具：创建/删除测试命名空间与 Pod | 第十四轮补录（第十三轮下载时未记录，属流程缺陷，已按裁决补录并加入本表）；**第二十五轮 T1 修正**：原登记值第 27 位为 `0`（`…c370728a…`），官方校验文件与产物实测均为 `1`（`…c371728a…`） |
 | buf | v1.47.2 | 经 Go module proxy：`go install github.com/bufbuild/buf/cmd/buf@v1.47.2` | `a71f9500cc4bb7db592a46f4b2718ac849c3a604fa3324004bdb60b40d670f83` | protobuf 代码生成与 lint/breaking 检查（`make gen`） | 第十四轮记录（构建自模块源码） |
 
 ## CI 使用的工具链（第二十轮 C1；第二十四轮 T4 改为五字段登记 + 强制校验）
@@ -61,7 +61,7 @@ CI（`.github/workflows/ci.yml`）固定使用下列版本。**未引入任何�
 | 名称 | 版本 | 平台 | SHA-256 | 来源 URL |
 | --- | --- | --- | --- | --- |
 | kind | v0.30.0 | darwin/arm64（本机实测） | `1f9b705cd82503f3cd8176022325cb469290dfbd589785b101fc9739a8c66c8e` | 模块代理：`sigs.k8s.io/kind@v0.30.0`（`go install`） |
-| kubectl | v1.31.4 | darwin/arm64（本机实测） | `a756bb911298a85af35c0111c370728a26c532d504fe8b534eb684501fcaf996` | `https://dl.k8s.io/release/v1.31.4/bin/darwin/arm64/kubectl` |
+| kubectl | v1.31.4 | darwin/arm64（本机实测） | `a756bb911298a85af35c0111c371728a26c532d504fe8b534eb684501fcaf996` | `https://dl.k8s.io/release/v1.31.4/bin/darwin/arm64/kubectl` |
 | buf | v1.47.2 | 模块（跨平台） | `a71f9500cc4bb7db592a46f4b2718ac849c3a604fa3324004bdb60b40d670f83` | 模块代理：`github.com/bufbuild/buf/cmd/buf@v1.47.2`（`go run`） |
 | protoc-gen-go | v1.36.1 | 模块（跨平台） | 经 Go module 校验和数据库（`go.sum`） | `google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.1` |
 | protoc-gen-go-grpc | v1.5.1 | 模块（跨平台） | 经 Go module 校验和数据库（`go.sum`） | `google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1` |
@@ -83,6 +83,25 @@ CI（`.github/workflows/ci.yml`）固定使用下列版本。**未引入任何�
 | protoc-gen-go / protoc-gen-go-grpc | 经 Go module proxy：`google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.1`、`google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1` | protobuf 代码生成插件 | 构建自模块源码 |
 
 ## 下载记录
+
+### 第二十五轮（T1）：**修正登记值，无新增外部二进制。**
+
+- **darwin/arm64 kubectl v1.31.4 的 SHA-256 登记错误已修正**：
+  - 旧值：`a756bb911298a85af35c0111c370728a26c532d504fe8b534eb684501fcaf996`
+  - 新值：`a756bb911298a85af35c0111c371728a26c532d504fe8b534eb684501fcaf996`
+  - 差异位置：**第 27 位**（十六进制串内 0-based 索引 26）旧 `0` → 新 `1`；
+  - 来源：官方校验文件 `https://dl.k8s.io/release/v1.31.4/bin/darwin/arm64/kubectl.sha256`；
+  - 实测：下载 `https://dl.k8s.io/release/v1.31.4/bin/darwin/arm64/kubectl`
+    共 **56,560,802 字节**，`shasum -a 256` 与官方值逐字符一致；
+  - 取值日期：2026-10-13；修正位置：本表"已声明并校验"行与"平台相关条目"表各一处；
+  - 性质：**转写错误**（单字符），非上游重签名（同一 URL 的产物哈希与官方校验文件一致）。
+- **linux/amd64 两值再次核对**（T1e，方法同上）：
+  - kubectl `298e19e9…5620f` ↔ 官方 `.sha256` 一致，产物实测 56,381,592 字节一致；
+  - go 1.27.2 `ecbadb99…45fe5` ↔ `https://dl.google.com/go/go1.27.2.linux-amd64.tar.gz.sha256`
+    一致，产物实测 70,590,635 字节一致（本机 `dl.google.com` TLS 可达，与第二十四轮
+    会话外说明"本机握手不通"不同，属环境差异，不影响取值）。
+- 本轮**未新下载任何未在表内登记的二进制**；darwin 版 kubectl 仅为本轮校验用途，
+  临时产物置于 `/tmp`，不进入仓库、不参与构建。
 
 ### 第二十四轮：**本轮无新外部二进制。**
 
