@@ -3,6 +3,7 @@ package testdb
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -31,10 +32,51 @@ type RunSchema struct {
 // RunSchemaPrefix 每轮独立 schema 的强制前缀（删除前校验）。
 const RunSchemaPrefix = "test_run_"
 
+// ResidualCheckEnv 设为 "1" 时，`make residual-check` 正在执行全局残留检查。
+// 单一来源在 testdb（k8stest 的常量引用它），T3 的保留开关要认它。
+const ResidualCheckEnv = "AGENT_OPS_RESIDUAL_CHECK"
+
+// KeepSchemaEnv 本地调试开关（第二十五轮 T3）：设为 "1" 时，**测试失败**的
+// run schema 予以保留，方便直接连库排查。
+//
+// 硬限制（T3b）：在 CI（`CI=true`/`CI=1`）或残留检查模式下**启动即失败**——
+// 保留 schema 会直接制造残留，让 `make residual-check` 失去意义；
+// 这个开关绝不能变成"在 CI 里留下垃圾"的后门。
+const KeepSchemaEnv = "AGENT_OPS_KEEP_SCHEMA"
+
+// KeepSchemaEnabled 解析本地保留开关。
+//
+// 返回 keep=false 表示按第二十四轮 R1c 的策略执行（失败也删除）。
+// 当开关开启但处于 CI 或残留检查模式时返回错误，由调用方 fail-fast。
+func KeepSchemaEnabled() (bool, error) {
+	if strings.TrimSpace(os.Getenv(KeepSchemaEnv)) != "1" {
+		return false, nil
+	}
+	ci := strings.ToLower(strings.TrimSpace(os.Getenv("CI")))
+	if ci == "true" || ci == "1" {
+		return false, fmt.Errorf("testdb：%s=1 在 CI 中禁止（CI=true）——失败用例的 schema 必须删除，"+
+			"否则残留门禁形同虚设", KeepSchemaEnv)
+	}
+	if strings.TrimSpace(os.Getenv(ResidualCheckEnv)) == "1" {
+		return false, fmt.Errorf("testdb：%s=1 在残留检查模式（%s=1）下禁止——保留即制造残留",
+			KeepSchemaEnv, ResidualCheckEnv)
+	}
+	return true, nil
+}
+
+// ShouldRetainOnFailure 判定失败用例的 schema 是否保留（纯函数，便于测试）。
+func ShouldRetainOnFailure(failed, keep bool) bool { return failed && keep }
+
 // NewRunSchema 创建每轮独立 schema 与连接池（search_path 指向该 schema）。
 // 库名校验（Validate）在此复用：非 agent_ops_test 一律拒绝。
 func NewRunSchema(t *testing.T) *RunSchema {
 	t.Helper()
+	// T3b：开关在 CI / 残留检查模式下**启动即失败**（在建 schema 之前就拒绝，
+	// 这样连一个 schema 都不会留下）。
+	keep, kerr := KeepSchemaEnabled()
+	if kerr != nil {
+		t.Fatalf("%v", kerr)
+	}
 	base, err := Resolve()
 	if err != nil {
 		t.Fatalf("测试数据库校验失败（fail closed）：%v", err)
@@ -89,8 +131,15 @@ END $$;`,
 	rs := &RunSchema{name: name, dsn: dsn, pool: pool}
 	t.Cleanup(func() {
 		pool.Close()
-		// R1c：失败路径同样删除（清理是单一路径 CleanupRunSchema，便于测试覆盖）。
-		if err := CleanupRunSchema(context.Background(), base, name, t.Failed(), t.Logf); err != nil {
+		failed := t.Failed()
+		// T3：本地显式开了保留开关时，失败用例的 schema 留下排查。
+		if ShouldRetainOnFailure(failed, keep) {
+			t.Logf("[H5] 测试失败，%s=1 已生效 → 保留 schema %s 供本地排查（CI/残留检查模式下该开关被禁止）",
+				KeepSchemaEnv, name)
+			return
+		}
+		// R1c：其余情况（含失败）一律删除，清理走唯一入口 CleanupRunSchema。
+		if err := CleanupRunSchema(context.Background(), base, name, failed, t.Logf); err != nil {
 			t.Errorf("[H5] 删除测试 schema 失败：%v", err)
 		}
 	})

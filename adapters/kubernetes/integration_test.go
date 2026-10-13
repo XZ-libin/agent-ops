@@ -11,7 +11,23 @@ import (
 	"time"
 
 	contractv1 "github.com/ORG/agent-ops/contract/gen/go/agent_ops/contract/v1"
+	"github.com/ORG/agent-ops/internal/toolpin"
 )
+
+// pinnedKubectl 返回与 docs/tooling.md 登记版本一致的 kubectl（第二十五轮 T2b）。
+//
+// 不再"优先 PATH"：本机 PATH 上是 Docker Desktop 自带的 v1.36.1，与登记的 v1.31.4
+// 不是同一个二进制。版本不符或找不到登记版本 → **失败并给出修复方式**，
+// 绝不静默使用其他版本。
+func pinnedKubectl(t *testing.T) string {
+	t.Helper()
+	bin, version, err := toolpin.PinnedKubectl()
+	if err != nil {
+		t.Fatalf("kubectl 版本闸门（T2）：%v", err)
+	}
+	t.Logf("[T2] kubectl 已钉到登记版本 %s（%s）", version, bin)
+	return bin
+}
 
 // 集成测试使用的固定镜像与命名（仅测试；版本固定，避免漂移）。
 const (
@@ -120,10 +136,10 @@ func deleteKindCluster(t *testing.T, kindBin, name string) {
 // （按裁决：被跳过的集成测试不计入通过）。
 func TestIntegrationReadOnlyAgainstKindCluster(t *testing.T) {
 	kindBin := toolPath(t, "kind")
-	kubectlBin := toolPath(t, "kubectl")
-	if kindBin == "" || kubectlBin == "" {
-		t.Skipf("未验证：缺少 kind 或 kubectl（kind=%q kubectl=%q），Kubernetes 集成测试未执行；"+
-			"本轮不予放行，需在具备 kind 的环境重跑。", kindBin, kubectlBin)
+	kubectlBin := pinnedKubectl(t)
+	if kindBin == "" {
+		t.Skipf("未验证：缺少 kind（kind=%q），Kubernetes 集成测试未执行；"+
+			"本轮不予放行，需在具备 kind 的环境重跑。", kindBin)
 	}
 
 	// 第十四轮 H4：集成测试**自建自删** kind 集群。
@@ -404,10 +420,10 @@ func containsPath(paths []string, want string) bool {
 // 不作为通过依据）。
 func TestIntegrationKindAvailabilityRecords(t *testing.T) {
 	kindBin := toolPath(t, "kind")
-	kubectlBin := toolPath(t, "kubectl")
+	kubectlBin := pinnedKubectl(t)
 	t.Logf("kind=%q kubectl=%q cluster=%q", kindBin, kubectlBin, kindClusterName())
-	if kindBin == "" || kubectlBin == "" {
-		t.Skip("未验证：kind 或 kubectl 缺失（集成验证前置条件不满足）。")
+	if kindBin == "" {
+		t.Skip("未验证：kind 缺失（集成验证前置条件不满足）。")
 	}
 	out, err := runTool(t, kindBin, "get", "clusters")
 	if err != nil {

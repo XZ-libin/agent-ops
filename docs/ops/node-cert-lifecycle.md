@@ -1,7 +1,8 @@
 # 节点证书生命周期运维手册
 
-> **验证状态：本地通过，CI 未验证。**
+> **第二十四轮：本地闭环；CI 未验证。**
 > 本文档与代码的一致性由测试守护（`internal/nodesvc` 的 T1–T5 用例）。
+> 首次 CI 运行的预期步骤与需回收的内容见 `docs/ops/first-ci-run.md`。
 
 适用对象：Agent Ops 节点代理（`node-agent`）与其控制面（`control-plane` 的节点域）。
 
@@ -254,5 +255,43 @@ D6 的修复：
 - **生产补发流程未定**（审批、权限、令牌交付）；
 - **多控制面的吊销分发未定**（当前为单控制面查表）；
 - **扫描器多实例 lease 协调未实现**：**多实例部署前必须先实现**（当前单实例是硬性约束）；
-- **CI 的 kubectl/go linux/amd64 SHA-256 待人工回填**：`TestCI2` 在回填前失败，属**预期合并阻断**；
+- **CI 的 kubectl/go linux/amd64 SHA-256 已回填**（2026-10-13 取自官方校验文件；
+  实现侧已独立复核实测哈希，见 [ADR-023 §8](../adr/ADR-023-证书状态机-服务端周期扫描-时钟回退重置加固与CI二进制SHA强制校验.md)），
+  `TestCI2_ToolingHasNoPendingSHAForCIBinaries` 的合并阻断条件已解除；
+  仍留**人工复核**待办（§11 的命令）；
 - **CI 首次运行未执行**（`make residual-check` / `gen-check` / `test` 尚未在 GitHub 上跑过）。
+
+---
+
+## 11. CI 侧外部二进制校验方式（第二十四轮 R4/T5）
+
+流水线里**任何**下载外部二进制的步骤，都必须在使用前完成逐字节校验；校验值来自
+`docs/tooling.md` 的登记表，而不是记忆或镜像站。
+
+| 二进制 | 获取方式 | 校验方式 | 失败后果 |
+| --- | --- | --- | --- |
+| kubectl（linux/amd64） | `curl -fsSLo /tmp/kubectl https://dl.k8s.io/release/<ver>/bin/linux/amd64/kubectl` | 从 `docs/tooling.md` 平台相关条目表提取该行的 SHA-256，执行 `echo "<sha>  /tmp/kubectl" \| sha256sum -c -` | 提取为空或含"待人工提供"占位 → 脚本 `exit 1`；哈希不符 → `sha256sum -c` 非零退出。两者都**中止 test job**（fail-closed） |
+| Go 工具链（linux/amd64） | `actions/setup-go`（按官方 `go.dev/dl` 清单下载） | setup-go 自身按官方清单校验校验和；登记表另存官方 `.sha256` 值供人工比对 | 校验不过则 setup-go 步骤失败 |
+| kind / buf | `go install` / `go run`（Go module proxy，非二进制下载） | Go 校验和数据库（`go.sum` / sum.golang.org） | 校验和不匹配即构建失败 |
+
+守卫（三条，`internal/repoguard/ci_sha_test.go`）：
+
+- `TestCI1_EveryBinaryDownloadVerifiesSHA`：解析 `ci.yml`，每个 HTTP 下载步骤之后必须紧跟 `sha256sum -c`；
+- `TestCI2_ToolingHasNoPendingSHAForCIBinaries`：CI 用到的二进制不得留"待回填"占位；
+- `TestCI3_ToolingDocFormat`：登记条目必须齐五字段（名称/版本/平台/SHA-256/来源 URL）。
+
+人工复核命令（与实现侧无关，任何人都可自行验证）：
+
+```sh
+# kubectl linux/amd64（应输出与 tooling.md 一致的单行哈希）
+curl -fsS https://dl.k8s.io/release/v1.31.4/bin/linux/amd64/kubectl.sha256
+# go 1.27.2 linux/amd64（官方发布站）
+curl -fsS https://dl.google.com/go/go1.27.2.linux-amd64.tar.gz.sha256
+# 或直接对产物求哈希（应与上面两个值一致）
+curl -fsSL https://dl.k8s.io/release/v1.31.4/bin/linux/amd64/kubectl | shasum -a 256
+curl -fsSL https://go.dev/dl/go1.27.2.linux-amd64.tar.gz          | shasum -a 256
+```
+
+> **第三方 Action 已钉到 commit SHA**（`actions/checkout@11d5960a…` # v4、
+> `actions/setup-go@40f1582b…` # v5）。升级 tag 时必须重新用官方 API 解析
+> `git/ref/tags/<tag>` 的 `object.sha` 并同步 `ci.yml` 顶部注释（复核记录见 ADR-023 §8）。

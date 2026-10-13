@@ -13,3 +13,5 @@ control-plane/control-plane
 gateway/gateway
 # 助手/agent 工作目录（轮次记录与测试日志，不属于项目源码）
 .workbuddy-ai/
+# 登记版本的本地工具二进制（第二十五轮 T2：由 docs/tooling.md 登记并实测校验后放置）
+.tools/

@@ -19,6 +19,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ORG/agent-ops/internal/testdb"
+	"github.com/ORG/agent-ops/internal/toolpin"
 )
 
 const (
@@ -42,6 +45,21 @@ const (
 func ToolPath(t *testing.T, name string) string {
 	t.Helper()
 	return toolPath(name)
+}
+
+// KubectlPinned 返回**与 docs/tooling.md 登记版本一致**的 kubectl 路径（第二十五轮 T2b）。
+//
+// 与 ToolPath 的区别：绝不接受"顺手能找到的其他版本"。解析失败、找不到、
+// 或 gitVersion 与登记不符 → t.Fatal 并给出修复方式（设 AGENT_OPS_KUBECTL_BIN
+// 或把校验过的产物放到 .tools/kubectl）。
+func KubectlPinned(t *testing.T) string {
+	t.Helper()
+	bin, version, err := toolpin.PinnedKubectl()
+	if err != nil {
+		t.Fatalf("kubectl 版本闸门（T2）：%v", err)
+	}
+	t.Logf("[T2] kubectl 已钉到登记版本 %s（%s）", version, bin)
+	return bin
 }
 
 // toolPath 定位命令行工具（不需要 *testing.T，供残留检查复用）。
@@ -113,14 +131,13 @@ func Start(t *testing.T) *Cluster {
 			KubeconfigPath: p,
 			Owned:          false,
 			kindBin:        ToolPath(t, "kind"),
-			kubectlBin:     ToolPath(t, "kubectl"),
+			kubectlBin:     KubectlPinned(t),
 		}
 	}
 	kindBin := ToolPath(t, "kind")
-	kubectlBin := ToolPath(t, "kubectl")
-	if kindBin == "" || kubectlBin == "" {
-		t.Skipf("未验证：缺少 kind 或 kubectl（kind=%q kubectl=%q）；Kubernetes 集成测试未执行，不计入通过。",
-			kindBin, kubectlBin)
+	kubectlBin := KubectlPinned(t)
+	if kindBin == "" {
+		t.Skipf("未验证：缺少 kind（kind=%q）；Kubernetes 集成测试未执行，不计入通过。", kindBin)
 		return nil
 	}
 	name := fmt.Sprintf("%s%d", ClusterPrefix, time.Now().UnixNano())
@@ -325,8 +342,9 @@ func AssertClusterDeleted(t *testing.T, name string) {
 }
 
 // ResidualCheckEnv 设为 "1" 时，才执行**全局残留检查**（见 residual_test.go）。
+// 常量单一来源在 testdb（T3 的保留开关要认同一个环境变量）。
 // 全局检查必须在全部用例结束后单独运行（`go test ./...` 的并行包会让它误报）。
-const ResidualCheckEnv = "AGENT_OPS_RESIDUAL_CHECK"
+const ResidualCheckEnv = testdb.ResidualCheckEnv
 
 // tailLines 取文本末尾 n 行（失败信息用）。
 func tailLines(s string, n int) string {
